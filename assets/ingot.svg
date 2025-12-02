@@ -1,21 +1,16 @@
 <svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Primary background gradients -->
     <linearGradient id="hexBg" x1="10" y1="10" x2="130" y2="130" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#0a1428"/>
       <stop offset="0.3" stop-color="#162544"/>
       <stop offset="0.6" stop-color="#1a1f3a"/>
       <stop offset="1" stop-color="#0d1826"/>
     </linearGradient>
-
-    <!-- Radial glow for depth -->
     <radialGradient id="centerGlow" cx="50%" cy="48%" r="60%">
       <stop offset="0" stop-color="#5fd9ff" stop-opacity="0.4"/>
       <stop offset="0.5" stop-color="#6eb8ff" stop-opacity="0.2"/>
       <stop offset="1" stop-color="#0d1e2f" stop-opacity="0"/>
     </radialGradient>
-
-    <!-- Hexagon edge gradient -->
     <linearGradient id="hexEdge" x1="20" y1="20" x2="120" y2="120" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#5de8ff" stop-opacity="0.95"/>
       <stop offset="0.25" stop-color="#6fb5ff" stop-opacity="0.85"/>
@@ -23,8 +18,6 @@
       <stop offset="0.75" stop-color="#6fb5ff" stop-opacity="0.85"/>
       <stop offset="1" stop-color="#7ff5e1" stop-opacity="0.95"/>
     </linearGradient>
-
-    <!-- Metallic ingot gradients -->
     <linearGradient id="ingotMain" x1="45" y1="55" x2="95" y2="90" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#e8f5ff"/>
       <stop offset="0.15" stop-color="#b4e8ff"/>
@@ -34,263 +27,88 @@
       <stop offset="0.9" stop-color="#a5dbff"/>
       <stop offset="1" stop-color="#d4efff"/>
     </linearGradient>
-
     <linearGradient id="ingotTop" x1="50" y1="52" x2="90" y2="62" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
       <stop offset="0.3" stop-color="#c8f0ff" stop-opacity="0.85"/>
       <stop offset="0.7" stop-color="#7dd8ff" stop-opacity="0.75"/>
       <stop offset="1" stop-color="#b8e6ff" stop-opacity="0.85"/>
     </linearGradient>
-
     <linearGradient id="ingotSide" x1="52" y1="62" x2="88" y2="88" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#6dc8ff"/>
       <stop offset="0.4" stop-color="#4395d4"/>
       <stop offset="0.7" stop-color="#2b6ba8"/>
       <stop offset="1" stop-color="#3a82c4"/>
     </linearGradient>
-
     <linearGradient id="ingotHighlight" x1="48" y1="58" x2="92" y2="68" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#ffffff" stop-opacity="0.7"/>
       <stop offset="0.5" stop-color="#dff7ff" stop-opacity="0.4"/>
       <stop offset="1" stop-color="#8ad8ff" stop-opacity="0.2"/>
     </linearGradient>
-
-    <!-- Geometric pattern gradients -->
     <linearGradient id="gridLine1" x1="30" y1="30" x2="110" y2="110" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#5dd9ff" stop-opacity="0.2"/>
       <stop offset="0.5" stop-color="#6fb5ff" stop-opacity="0.35"/>
       <stop offset="1" stop-color="#7ff5e1" stop-opacity="0.15"/>
     </linearGradient>
-
     <linearGradient id="gridLine2" x1="110" y1="30" x2="30" y2="110" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#7ff5e1" stop-opacity="0.15"/>
       <stop offset="0.5" stop-color="#6fb5ff" stop-opacity="0.3"/>
       <stop offset="1" stop-color="#5dd9ff" stop-opacity="0.2"/>
     </linearGradient>
-
-    <!-- Inner geometric gradient -->
     <linearGradient id="innerGeometric" x1="40" y1="40" x2="100" y2="100" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#5dd9ff" stop-opacity="0.4"/>
       <stop offset="1" stop-color="#6fb5ff" stop-opacity="0.15"/>
     </linearGradient>
-
-    <!-- Filters for effects -->
-    <filter id="mainGlow" x="-20" y="-20" width="180" height="180" filterUnits="userSpaceOnUse">
-      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#0a1428" flood-opacity="0.8"/>
-      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#5dd9ff" flood-opacity="0.3"/>
-    </filter>
-
-    <filter id="metalShine" x="-10" y="-10" width="160" height="160" filterUnits="userSpaceOnUse">
-      <feGaussianBlur stdDeviation="0.8"/>
-      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#ffffff" flood-opacity="0.4"/>
-    </filter>
-
-    <filter id="sparkleFilter" x="-5" y="-5" width="150" height="150" filterUnits="userSpaceOnUse">
-      <feGaussianBlur stdDeviation="0.6"/>
-    </filter>
-
-    <!-- Patterns for intricate detail -->
-    <pattern id="circuitPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-      <path d="M2 2 L18 2 M10 2 L10 18 M2 18 L18 18" stroke="#5dd9ff" stroke-width="0.3" stroke-opacity="0.15"/>
-      <circle cx="2" cy="2" r="0.5" fill="#6fb5ff" fill-opacity="0.25"/>
-      <circle cx="18" cy="18" r="0.5" fill="#7ff5e1" fill-opacity="0.2"/>
-    </pattern>
-
     <clipPath id="hexClip">
       <polygon points="70,8 118,36 118,92 70,120 22,92 22,36"/>
     </clipPath>
   </defs>
-
-
-  <!-- Main hexagon with glow -->
-  <g filter="url(#mainGlow)">
-    <polygon points="70,8 118,36 118,92 70,120 22,92 22,36"
-             fill="url(#hexBg)"
-             stroke="url(#hexEdge)"
-             stroke-width="2"/>
+  <g clip-path="url(#hexClip)">
+    <polygon points="70,8 118,36 118,92 70,120 22,92 22,36" fill="url(#hexBg)" stroke="url(#hexEdge)" stroke-width="2"/>
+    <polygon points="70,18 108,40 108,88 70,110 32,88 32,40" fill="url(#centerGlow)"/>
+    <g opacity="0.6">
+      <path d="M35 48 L105 98" stroke="url(#gridLine1)" stroke-width="1" stroke-dasharray="3 4"/>
+      <path d="M35 98 L105 48" stroke="url(#gridLine2)" stroke-width="1" stroke-dasharray="3 4"/>
+      <path d="M32 70 L108 70" stroke="url(#gridLine1)" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.7"/>
+      <path d="M70 28 L70 110" stroke="url(#gridLine2)" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.7"/>
+    </g>
+    <g opacity="0.35">
+      <polygon points="70,32 96,46 96,82 70,96 44,82 44,46" fill="none" stroke="url(#innerGeometric)" stroke-width="1" stroke-dasharray="4 3"/>
+      <polygon points="70,40 88,50 88,78 70,88 52,78 52,50" fill="none" stroke="url(#innerGeometric)" stroke-width="0.8" stroke-dasharray="3 2"/>
+    </g>
+    <g opacity="0.7">
+      <circle cx="48" cy="52" r="1.2" fill="#5dd9ff"/>
+      <circle cx="92" cy="52" r="1.2" fill="#7ff5e1"/>
+      <circle cx="48" cy="88" r="1.2" fill="#6fb5ff"/>
+      <circle cx="92" cy="88" r="1.2" fill="#5dd9ff"/>
+      <circle cx="70" cy="46" r="1" fill="#8ac5ff"/>
+      <circle cx="70" cy="94" r="1" fill="#6fb5ff"/>
+    </g>
+    <g>
+      <path d="M50 62 L58 57 L82 57 L90 62 L88 78 L82 84 L58 84 L52 78 Z" fill="#0d1826" opacity="0.6"/>
+      <path d="M48 60 L56 55 L84 55 L92 60 L90 76 L84 82 L56 82 L50 76 Z" fill="url(#ingotMain)" stroke="#4ba8e8" stroke-width="0.5"/>
+      <path d="M56 55 L70 48 L84 55 L70 62 Z" fill="url(#ingotTop)" stroke="#b4e8ff" stroke-width="0.4"/>
+      <path d="M84 55 L92 60 L90 76 L84 82 L70 75 L70 62 Z" fill="url(#ingotSide)" opacity="0.85"/>
+      <path d="M56 55 L48 60 L50 76 L56 82 L70 75 L70 62 Z" fill="url(#ingotSide)" opacity="0.7"/>
+    </g>
+    <g>
+      <path d="M58 57 L70 51 L82 57" stroke="url(#ingotHighlight)" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+      <path d="M60 62 L78 62" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.6" stroke-linecap="round"/>
+      <path d="M62 68 L76 68" stroke="#dff7ff" stroke-width="1" stroke-opacity="0.4" stroke-linecap="round"/>
+    </g>
+    <g opacity="0.5">
+      <path d="M58 60 L82 60" stroke="#4ba8e8" stroke-width="0.3" stroke-dasharray="1 1.5"/>
+      <path d="M56 66 L84 66" stroke="#3a82c4" stroke-width="0.3" stroke-dasharray="1 1.5"/>
+      <path d="M56 72 L84 72" stroke="#4ba8e8" stroke-width="0.3" stroke-dasharray="1 1.5"/>
+      <path d="M58 78 L82 78" stroke="#3a82c4" stroke-width="0.3" stroke-dasharray="1 1.5"/>
+    </g>
+    <g>
+      <circle cx="64" cy="53" r="1.2" fill="#ffffff" opacity="0.9"/>
+      <circle cx="76" cy="51" r="1" fill="#dff7ff" opacity="0.85"/>
+      <circle cx="70" cy="49" r="1.4" fill="#e8f5ff" opacity="0.95"/>
+      <circle cx="66" cy="64" r="0.9" fill="#b4e8ff" opacity="0.7"/>
+      <circle cx="74" cy="66" r="0.8" fill="#c8f0ff" opacity="0.75"/>
+    </g>
+    <path d="M70 8 L76 12 L70 16 L64 12 Z" fill="#5dd9ff" opacity="0.8"/>
+    <path d="M22 92 L70 120 L118 92" stroke="#5dd9ff" stroke-width="1.2" stroke-opacity="0.5"/>
   </g>
-
-  <!-- Inner radial glow -->
-  <polygon points="70,18 108,40 108,88 70,110 32,88 32,40"
-           fill="url(#centerGlow)"/>
-
-  <!-- Geometric pattern layer -->
-  <g opacity="0.5" clip-path="url(#hexClip)">
-    <rect width="140" height="140" fill="url(#circuitPattern)"/>
-  </g>
-
-  <!-- Complex geometric grid lines -->
-  <g opacity="0.6">
-    <!-- Diagonal intersecting lines -->
-    <path d="M35 48 L105 98" stroke="url(#gridLine1)" stroke-width="1" stroke-dasharray="3 4"/>
-    <path d="M35 98 L105 48" stroke="url(#gridLine2)" stroke-width="1" stroke-dasharray="3 4"/>
-
-    <!-- Horizontal and vertical accent lines -->
-    <path d="M32 70 L108 70" stroke="url(#gridLine1)" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.7"/>
-    <path d="M70 28 L70 110" stroke="url(#gridLine2)" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.7"/>
-
-    <!-- Corner connection lines -->
-    <path d="M35 42 L45 36" stroke="#5dd9ff" stroke-width="0.6" stroke-opacity="0.4"/>
-    <path d="M105 42 L95 36" stroke="#7ff5e1" stroke-width="0.6" stroke-opacity="0.4"/>
-    <path d="M35 98 L45 104" stroke="#6fb5ff" stroke-width="0.6" stroke-opacity="0.4"/>
-    <path d="M105 98 L95 104" stroke="#5dd9ff" stroke-width="0.6" stroke-opacity="0.4"/>
-  </g>
-
-  <!-- Inner hexagonal geometric pattern -->
-  <g opacity="0.35">
-    <polygon points="70,32 96,46 96,82 70,96 44,82 44,46"
-             fill="none"
-             stroke="url(#innerGeometric)"
-             stroke-width="1"
-             stroke-dasharray="4 3"/>
-
-    <polygon points="70,40 88,50 88,78 70,88 52,78 52,50"
-             fill="none"
-             stroke="url(#innerGeometric)"
-             stroke-width="0.8"
-             stroke-dasharray="3 2"/>
-  </g>
-
-  <!-- Connecting nodes at pattern intersections -->
-  <g opacity="0.7">
-    <circle cx="48" cy="52" r="1.2" fill="#5dd9ff"/>
-    <circle cx="92" cy="52" r="1.2" fill="#7ff5e1"/>
-    <circle cx="48" cy="88" r="1.2" fill="#6fb5ff"/>
-    <circle cx="92" cy="88" r="1.2" fill="#5dd9ff"/>
-    <circle cx="70" cy="46" r="1" fill="#8ac5ff"/>
-    <circle cx="70" cy="94" r="1" fill="#6fb5ff"/>
-  </g>
-
-  <!-- Main ingot bar - base layer with shadow -->
-  <g>
-    <!-- Shadow/depth layer -->
-    <path d="M50 62 L58 57 L82 57 L90 62 L88 78 L82 84 L58 84 L52 78 Z"
-          fill="#0d1826"
-          opacity="0.6"/>
-
-    <!-- Main ingot body -->
-    <path d="M48 60 L56 55 L84 55 L92 60 L90 76 L84 82 L56 82 L50 76 Z"
-          fill="url(#ingotMain)"
-          stroke="#4ba8e8"
-          stroke-width="0.5"/>
-
-    <!-- Top face (3D perspective) -->
-    <path d="M56 55 L70 48 L84 55 L70 62 Z"
-          fill="url(#ingotTop)"
-          stroke="#b4e8ff"
-          stroke-width="0.4"/>
-
-    <!-- Right side face (3D perspective) -->
-    <path d="M84 55 L92 60 L90 76 L84 82 L70 75 L70 62 Z"
-          fill="url(#ingotSide)"
-          opacity="0.85"/>
-
-    <!-- Left side face (3D perspective) -->
-    <path d="M56 55 L48 60 L50 76 L56 82 L70 75 L70 62 Z"
-          fill="url(#ingotSide)"
-          opacity="0.7"/>
-  </g>
-
-  <!-- Metallic highlights and shine effects -->
-  <g filter="url(#metalShine)">
-    <!-- Top edge highlight -->
-    <path d="M58 57 L70 51 L82 57"
-          stroke="url(#ingotHighlight)"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          opacity="0.9"/>
-
-    <!-- Main body highlight strip -->
-    <path d="M60 62 L78 62"
-          stroke="#ffffff"
-          stroke-width="1.5"
-          stroke-opacity="0.6"
-          stroke-linecap="round"/>
-
-    <!-- Secondary highlight -->
-    <path d="M62 68 L76 68"
-          stroke="#dff7ff"
-          stroke-width="1"
-          stroke-opacity="0.4"
-          stroke-linecap="round"/>
-
-    <!-- Edge bevels -->
-    <path d="M52 64 L88 64"
-          stroke="#8ad8ff"
-          stroke-width="0.6"
-          stroke-opacity="0.5"
-          stroke-dasharray="2 3"/>
-
-    <path d="M54 74 L86 74"
-          stroke="#6dc8ff"
-          stroke-width="0.6"
-          stroke-opacity="0.4"
-          stroke-dasharray="2 3"/>
-  </g>
-
-  <!-- Ingot surface details and engravings -->
-  <g opacity="0.5">
-    <!-- Horizontal detail lines -->
-    <path d="M58 60 L82 60" stroke="#4ba8e8" stroke-width="0.3" stroke-dasharray="1 1.5"/>
-    <path d="M56 66 L84 66" stroke="#3a82c4" stroke-width="0.3" stroke-dasharray="1 1.5"/>
-    <path d="M56 72 L84 72" stroke="#4ba8e8" stroke-width="0.3" stroke-dasharray="1 1.5"/>
-    <path d="M58 78 L82 78" stroke="#3a82c4" stroke-width="0.3" stroke-dasharray="1 1.5"/>
-
-    <!-- Vertical accent lines -->
-    <path d="M62 58 L60 80" stroke="#5dd9ff" stroke-width="0.25" stroke-opacity="0.6"/>
-    <path d="M70 62 L70 75" stroke="#6dc8ff" stroke-width="0.25" stroke-opacity="0.5"/>
-    <path d="M78 58 L80 80" stroke="#5dd9ff" stroke-width="0.25" stroke-opacity="0.6"/>
-  </g>
-
-  <!-- Additional geometric accents around ingot -->
-  <g opacity="0.4">
-    <!-- Corner brackets -->
-    <path d="M42 56 L46 56 L46 52" stroke="#5dd9ff" stroke-width="0.8" stroke-linecap="round"/>
-    <path d="M98 56 L94 56 L94 52" stroke="#7ff5e1" stroke-width="0.8" stroke-linecap="round"/>
-    <path d="M42 86 L46 86 L46 90" stroke="#6fb5ff" stroke-width="0.8" stroke-linecap="round"/>
-    <path d="M98 86 L94 86 L94 90" stroke="#5dd9ff" stroke-width="0.8" stroke-linecap="round"/>
-
-    <!-- Connecting elements -->
-    <circle cx="40" cy="70" r="1.5" fill="none" stroke="#5dd9ff" stroke-width="0.6"/>
-    <circle cx="100" cy="70" r="1.5" fill="none" stroke="#7ff5e1" stroke-width="0.6"/>
-  </g>
-
-  <!-- Sparkle effects for metallic shine -->
-  <g filter="url(#sparkleFilter)">
-    <!-- Top ingot sparkles -->
-    <circle cx="64" cy="53" r="1.2" fill="#ffffff" opacity="0.9"/>
-    <circle cx="76" cy="51" r="1" fill="#dff7ff" opacity="0.85"/>
-    <circle cx="70" cy="49" r="1.4" fill="#e8f5ff" opacity="0.95"/>
-
-    <!-- Body sparkles -->
-    <circle cx="66" cy="64" r="0.9" fill="#b4e8ff" opacity="0.7"/>
-    <circle cx="74" cy="66" r="0.8" fill="#c8f0ff" opacity="0.75"/>
-    <circle cx="70" cy="70" r="1" fill="#dff7ff" opacity="0.8"/>
-
-    <!-- Ambient sparkles around logo -->
-    <circle cx="52" cy="44" r="1" fill="#5dd9ff" opacity="0.7"/>
-    <circle cx="88" cy="44" r="1.1" fill="#7ff5e1" opacity="0.75"/>
-    <circle cx="45" cy="70" r="0.9" fill="#6fb5ff" opacity="0.65"/>
-    <circle cx="95" cy="70" r="1" fill="#8ac5ff" opacity="0.7"/>
-    <circle cx="56" cy="96" r="0.8" fill="#6fb5ff" opacity="0.6"/>
-    <circle cx="84" cy="96" r="0.9" fill="#5dd9ff" opacity="0.65"/>
-  </g>
-
-  <!-- Top vertex accent -->
-  <path d="M70 8 L76 12 L70 16 L64 12 Z"
-        fill="#5dd9ff"
-        opacity="0.8"/>
-
-  <!-- Bottom edge accent line -->
-  <path d="M22 92 L70 120 L118 92"
-        stroke="#5dd9ff"
-        stroke-width="1.2"
-        stroke-opacity="0.5"/>
-
-  <!-- Final subtle outer glow ring -->
-  <polygon points="70,10 116,37 116,91 70,118 24,91 24,37"
-           fill="none"
-           stroke="#6fb5ff"
-           stroke-width="0.5"
-           stroke-opacity="0.3"/>
 </svg>
