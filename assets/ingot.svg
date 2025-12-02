@@ -101,8 +101,6 @@
     </clipPath>
   </defs>
 
-  <!-- Background -->
-  <rect width="140" height="140" fill="#050b15"/>
 
   <!-- Main hexagon with glow -->
   <g filter="url(#mainGlow)">
