@@ -8,7 +8,7 @@
 
 [![GitHub](https://img.shields.io/badge/github-North--Shore--AI%2Fingot-blue)](https://github.com/North-Shore-AI/ingot)
 
-Ingot is a Phoenix LiveView application for **sample generation** and **human labeling workflows**, built on top of [Forge](../forge) and [Anvil](../anvil).
+Ingot is a Phoenix LiveView application for **sample generation** and **human labeling workflows**, built on top of [Forge](https://hex.pm/packages/forge_ex) and [Anvil](https://hex.pm/packages/anvil_ex).
 
 In a world already full of perfectly good data labeling tools, Ingot is the one that runs on the BEAM for reasons that, in hindsight, appear to be *intentional*.
 
@@ -18,8 +18,8 @@ In a world already full of perfectly good data labeling tools, Ingot is the one 
 
 Ingot is a **thin web shell** around two Elixir libraries:
 
-- **[Forge](../forge)** – creates and manages *samples* via pipelines
-- **[Anvil](../anvil)** – manages human labeling queues, assignments, labels, and agreements
+- **[Forge](https://hex.pm/packages/forge_ex)** – creates and manages *samples* via pipelines
+- **[Anvil](https://hex.pm/packages/anvil_ex)** – manages human labeling queues, assignments, labels, and agreements
 
 Ingot’s job is to:
 
@@ -77,14 +77,14 @@ You probably *don’t* want Ingot if you just need a generic labeling SaaS in fi
 - Elixir **1.15+**
 - Erlang/OTP **26+**
 - Node.js **18+** (for asset compilation)
-- `forge/` and `anvil/` available as sibling directories or deps
+- `forge` and `anvil` from Hex (`~> 0.1.0`)
 
 ### Setup
 
 ```bash
 git clone https://github.com/North-Shore-AI/ingot.git
 cd ingot
-````
+```
 
 Install dependencies:
 
@@ -236,8 +236,8 @@ The short version: Phoenix only does presentation and request orchestration; the
 
 * **Phoenix** – Web framework
 * **Phoenix LiveView** – Real-time UI
-* **Forge** – Sample generation and pipelines
-* **Anvil** – Labeling queues, labels, agreements
+* **Forge** (`~> 0.1.0` via Hex) – Sample generation and pipelines
+* **Anvil** (`~> 0.1.0` via Hex) – Labeling queues, labels, agreements
 
 ---
 
