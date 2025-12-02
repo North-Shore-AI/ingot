@@ -1,6 +1,10 @@
+<div align="center">
+
 # Ingot
 
-![Ingot Logo](assets/ingot.svg)
+<img src="assets/ingot.svg" alt="Ingot Logo" width="140"/>
+
+</div>
 
 [![GitHub](https://img.shields.io/badge/github-North--Shore--AI%2Fingot-blue)](https://github.com/North-Shore-AI/ingot)
 
