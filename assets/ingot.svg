@@ -1,0 +1,70 @@
+<svg width="720" height="720" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradientI" x1="22" y1="14" x2="300" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0a1122"/>
+      <stop offset="0.32" stop-color="#12345c"/>
+      <stop offset="0.64" stop-color="#1b1d36"/>
+      <stop offset="1" stop-color="#081522"/>
+    </linearGradient>
+    <radialGradient id="glowI" cx="50%" cy="46%" r="66%">
+      <stop offset="0" stop-color="#66fff2" stop-opacity="0.55"/>
+      <stop offset="0.45" stop-color="#7ec9ff" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#0c1d2c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="edgeGradientI" x1="36" y1="36" x2="284" y2="284" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#68ffe4" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#6ea0ff" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#9bffba" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="ingotMetal" x1="96" y1="134" x2="226" y2="210" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e9fff4"/>
+      <stop offset="0.35" stop-color="#6afff2"/>
+      <stop offset="0.7" stop-color="#57b0ff"/>
+      <stop offset="1" stop-color="#f6ffa8"/>
+    </linearGradient>
+    <linearGradient id="ingotEdge" x1="120" y1="150" x2="200" y2="210" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="0.4" stop-color="#6efbf2" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#fdd088" stop-opacity="0.5"/>
+    </linearGradient>
+    <filter id="softGlowI" x="-24" y="-24" width="368" height="368" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#080c16" flood-opacity="0.7"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="24" flood-color="#6bfff0" flood-opacity="0.16"/>
+    </filter>
+    <filter id="sparkle" x="-10" y="-10" width="340" height="340" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="1.2"/>
+    </filter>
+    <linearGradient id="gridStrokeI" x1="0" y1="0" x2="320" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7cffe9" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#b0ff9c" stop-opacity="0.08"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="320" fill="#040813"/>
+  <g filter="url(#softGlowI)">
+    <polygon points="160,12 276,82 276,238 160,308 44,238 44,82" fill="url(#bgGradientI)" stroke="url(#edgeGradientI)" stroke-width="4"/>
+    <polygon points="160,40 254,96 254,224 160,280 66,224 66,96" fill="url(#glowI)" stroke="#6effe4" stroke-opacity="0.24" stroke-width="2"/>
+  </g>
+  <g opacity="0.36">
+    <path d="M72 120 L248 214" stroke="url(#gridStrokeI)" stroke-width="1" stroke-dasharray="6 8"/>
+    <path d="M84 214 L236 126" stroke="url(#gridStrokeI)" stroke-width="1" stroke-dasharray="5 7"/>
+    <circle cx="106" cy="122" r="2.3" fill="#74ffe9"/>
+    <circle cx="214" cy="210" r="2.5" fill="#eaffbf"/>
+    <circle cx="178" cy="140" r="2.1" fill="#c4f4ff"/>
+  </g>
+  <g transform="translate(-8.482 -32.255)">
+    <path d="M86 186 L130 152 C136 148 142 146 150 146 H214 C222 146 229 150 234 158 L252 188 C256 194 253 202 246 204 L116 238 C108 240 100 236 98 228 L84 198 C82 192 84 188 86 186 Z" fill="#0f1c32" stroke="#6affe8" stroke-width="2" stroke-opacity="0.6"/>
+    <path d="M98 190 L136 158 C140 154 146 152 152 152 H210 C214 152 218 154 220 158 L234 182 C238 188 236 194 230 196 L128 226 C122 228 116 226 114 220 L100 196 C98 194 96 192 98 190 Z" fill="url(#ingotMetal)"/>
+    <path d="M142 176 L198 176 C204 176 210 180 212 186 L218 200 C220 204 218 210 214 212 L140 236" stroke="url(#ingotEdge)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+    <path d="M120 208 L220 176" stroke="#d6fff6" stroke-width="2" stroke-opacity="0.4"/>
+    <path d="M128 186 H206" stroke="#5fffe7" stroke-width="2" stroke-dasharray="4 6" stroke-opacity="0.6"/>
+  </g>
+  <g opacity="0.85" filter="url(#sparkle)">
+    <circle cx="148" cy="126" r="3" fill="#c6fff5"/>
+    <circle cx="206" cy="112" r="2.6" fill="#7effec"/>
+    <circle cx="234" cy="144" r="2.8" fill="#d0ffb2"/>
+    <circle cx="108" cy="154" r="2.4" fill="#8cf7ff"/>
+    <circle cx="90" cy="190" r="2.2" fill="#f7ffe0"/>
+  </g>
+  <path d="M160 24 L172 32 L160 40 L148 32 Z" fill="#7cffe7" fill-opacity="0.78"/>
+  <path d="M44 238 L160 308 L276 238" stroke="#6cffe6" stroke-width="2" stroke-opacity="0.45"/>
+</svg>

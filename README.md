@@ -1,5 +1,7 @@
 # Ingot
 
+![Ingot Logo](assets/ingot.svg)
+
 [![GitHub](https://img.shields.io/badge/github-North--Shore--AI%2Fingot-blue)](https://github.com/North-Shore-AI/ingot)
 
 A Phoenix LiveView interface for sample generation and human labeling workflows. Ingot provides a thin, elegant wrapper around the [Forge](../forge) and [Anvil](../anvil) libraries, exposing their functionality through an intuitive web interface.
