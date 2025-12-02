@@ -3,6 +3,16 @@ defmodule Ingot.TelemetryHandlerTest do
 
   alias Ingot.TelemetryHandler
 
+  setup_all do
+    # Start PubSub if not already started
+    case Phoenix.PubSub.Supervisor.start_link(name: Ingot.PubSub) do
+      {:ok, _pid} -> :ok
+      {:error, {:already_started, _pid}} -> :ok
+    end
+
+    :ok
+  end
+
   setup do
     # Ensure clean state - detach any existing handler
     try do

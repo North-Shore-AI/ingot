@@ -50,21 +50,20 @@ defmodule Ingot.MixProject do
       {:lazy_html, ">= 0.1.0", only: :test},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
-      {:heroicons,
-       github: "tailwindlabs/heroicons",
-       tag: "v2.2.0",
-       sparse: "optimized",
-       app: false,
-       compile: false,
-       depth: 1},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1"},
       {:bandit, "~> 1.5"},
-      {:forge, path: "../forge", optional: true, runtime: false},
-      {:anvil, path: "../anvil", optional: true, runtime: false},
+      {:ecto_sql, "~> 3.10", optional: true, runtime: false},
+      {:postgrex, "~> 0.17", optional: true, runtime: false},
+      {:oban, "~> 2.17", optional: true, runtime: false},
+      {:cachex, "~> 3.6", optional: true, runtime: false},
+      {:fuse, "~> 2.5", optional: true, runtime: false},
+      {:httpoison, "~> 2.2", optional: true, runtime: false},
+      {:forge, "~> 0.1.0", hex: :forge_ex, optional: true, runtime: false},
+      {:anvil, "~> 0.1.0", hex: :anvil_ex, optional: true, runtime: false},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:supertester, "~> 0.3.1", only: :test}
@@ -89,7 +88,8 @@ defmodule Ingot.MixProject do
         "Changelog" => "#{@source_url}/blob/main/CHANGELOG.md"
       },
       maintainers: ["North-Shore-AI"],
-      files: ~w(lib priv assets .formatter.exs mix.exs README.md LICENSE CHANGELOG.md)
+      files:
+        ~w(lib priv assets assets/ingot.svg .formatter.exs mix.exs README.md LICENSE CHANGELOG.md)
     ]
   end
 
