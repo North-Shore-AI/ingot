@@ -2,7 +2,7 @@
 
 # Ingot
 
-<img src="assets/ingot.svg" alt="Ingot Logo" width="280"/>
+<img src="assets/ingot.svg" alt="Ingot Logo" width="392"/>
 
 </div>
 
