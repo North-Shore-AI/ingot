@@ -136,6 +136,164 @@ defmodule Ingot.AnvilClient.MockAdapter do
     []
   end
 
+  # Auth API implementation
+
+  @impl true
+  def upsert_user(attrs) do
+    if Map.get(attrs, :external_id) do
+      user = %{
+        id: "user_#{:rand.uniform(10000)}",
+        external_id: attrs.external_id,
+        email: attrs[:email] || "user@example.com",
+        name: attrs[:name] || "Test User",
+        created_at: DateTime.utc_now()
+      }
+
+      {:ok, user}
+    else
+      {:error, :invalid_attributes}
+    end
+  end
+
+  @impl true
+  def get_user_roles(user_id) do
+    cond do
+      user_id == "nonexistent" ->
+        {:error, :not_found}
+
+      user_id == "user_no_roles" ->
+        {:ok, []}
+
+      user_id == "admin_user" ->
+        {:ok,
+         [
+           %{role: :admin, scope: "global"}
+         ]}
+
+      user_id == "user_with_scoped_roles" ->
+        {:ok,
+         [
+           %{role: :labeler, scope: "queue:abc"},
+           %{role: :auditor, scope: "queue:xyz"}
+         ]}
+
+      true ->
+        {:ok,
+         [
+           %{role: :labeler, scope: "global"}
+         ]}
+    end
+  end
+
+  @impl true
+  def check_queue_access(user_id, queue_id) do
+    cond do
+      user_id == "nonexistent" ->
+        {:error, :not_found}
+
+      queue_id == "nonexistent_queue" ->
+        {:error, :not_found}
+
+      user_id == "admin_user" ->
+        {:ok, true}
+
+      queue_id == "queue_restricted" ->
+        {:ok, false}
+
+      true ->
+        {:ok, true}
+    end
+  end
+
+  @impl true
+  def create_invite(attrs) do
+    queue_id = Map.get(attrs, :queue_id)
+
+    if queue_id == "nonexistent" do
+      {:error, :not_found}
+    else
+      invite = %{
+        code: Ingot.Auth.InviteCode.generate(),
+        queue_id: queue_id,
+        role: Map.get(attrs, :role, :labeler),
+        max_uses: Map.get(attrs, :max_uses, 1),
+        remaining_uses: Map.get(attrs, :max_uses, 1),
+        expires_at: Map.get(attrs, :expires_at, DateTime.utc_now() |> DateTime.add(7, :day)),
+        created_by: Map.get(attrs, :created_by),
+        created_at: DateTime.utc_now()
+      }
+
+      # Store invite in process dictionary for testing
+      invites = Process.get(:mock_invites, %{})
+      Process.put(:mock_invites, Map.put(invites, invite.code, invite))
+
+      {:ok, invite}
+    end
+  end
+
+  @impl true
+  def get_invite(code) do
+    cond do
+      code == "EXPIRED_CODE" ->
+        {:error, :expired}
+
+      code == "EXHAUSTED_CODE" ->
+        {:error, :exhausted}
+
+      true ->
+        invites = Process.get(:mock_invites, %{})
+
+        case Map.get(invites, code) do
+          nil ->
+            {:error, :not_found}
+
+          invite ->
+            # Check if invite is exhausted
+            if invite.remaining_uses <= 0 do
+              {:error, :exhausted}
+            else
+              {:ok, invite}
+            end
+        end
+    end
+  end
+
+  @impl true
+  def redeem_invite(code, user_attrs) do
+    case get_invite(code) do
+      {:ok, invite} ->
+        # Create user
+        user = %{
+          id: "user_#{:rand.uniform(10000)}",
+          email: user_attrs[:email],
+          name: user_attrs[:name],
+          created_at: DateTime.utc_now()
+        }
+
+        # Update invite remaining uses
+        invites = Process.get(:mock_invites, %{})
+        updated_invite = Map.put(invite, :remaining_uses, invite.remaining_uses - 1)
+        Process.put(:mock_invites, Map.put(invites, code, updated_invite))
+
+        result = %{
+          user: user,
+          queue_id: invite.queue_id,
+          role: invite.role
+        }
+
+        {:ok, result}
+
+      error ->
+        error
+    end
+  end
+
+  @impl true
+  def health_check do
+    # Mock adapter is always healthy
+    {:ok, :healthy}
+  end
+
   # Private helpers
 
   defp valid_label?(label) do

@@ -35,6 +35,13 @@ defmodule Ingot.ForgeClient do
   """
   @callback queue_stats() :: {:ok, map()} | {:error, error()}
 
+  @doc """
+  Health check for Forge service.
+
+  Returns :ok if Forge is reachable and healthy, otherwise returns an error.
+  """
+  @callback health_check() :: {:ok, :healthy} | {:error, error()}
+
   # Legacy API support (for backward compatibility with existing code)
   @doc """
   Fetch next sample from queue for the given user.
@@ -114,6 +121,19 @@ defmodule Ingot.ForgeClient do
   Legacy API - maintained for backward compatibility.
   """
   def generate_batch(count), do: adapter().generate_batch(count)
+
+  @doc """
+  Health check for Forge service.
+
+  ## Examples
+
+      iex> ForgeClient.health_check()
+      {:ok, :healthy}
+
+      iex> ForgeClient.health_check()
+      {:error, :not_available}
+  """
+  def health_check, do: adapter().health_check()
 
   # Private helpers
 

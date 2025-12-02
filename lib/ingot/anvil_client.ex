@@ -75,6 +75,61 @@ defmodule Ingot.AnvilClient do
   """
   @callback export_csv() :: {:ok, String.t()} | {:error, error()}
 
+  # Auth API callbacks
+
+  @doc """
+  Upsert a user (create or update).
+
+  Creates a new user or updates an existing one based on external_id.
+  Used for OIDC just-in-time provisioning.
+  """
+  @callback upsert_user(attrs :: map()) ::
+              {:ok, map()} | {:error, :invalid_attributes | error()}
+
+  @doc """
+  Get user roles.
+
+  Returns a list of roles assigned to the user.
+  """
+  @callback get_user_roles(user_id) :: {:ok, [map()]} | {:error, error()}
+
+  @doc """
+  Check if user has access to a queue.
+
+  Returns true if the user has permission to access the queue.
+  """
+  @callback check_queue_access(user_id, queue_id) :: {:ok, boolean()} | {:error, error()}
+
+  @doc """
+  Create an invite code for a queue.
+
+  Generates an invite code that can be redeemed by external labelers.
+  """
+  @callback create_invite(attrs :: map()) :: {:ok, map()} | {:error, error()}
+
+  @doc """
+  Get invite by code.
+
+  Returns invite details if the code is valid and not expired/exhausted.
+  """
+  @callback get_invite(code :: String.t()) ::
+              {:ok, map()} | {:error, :not_found | :expired | :exhausted}
+
+  @doc """
+  Redeem an invite code.
+
+  Creates a user and grants access to the queue associated with the invite.
+  """
+  @callback redeem_invite(code :: String.t(), user_attrs :: map()) ::
+              {:ok, map()} | {:error, :not_found | :expired | :exhausted | error()}
+
+  @doc """
+  Health check for Anvil service.
+
+  Returns :ok if Anvil is reachable and healthy, otherwise returns an error.
+  """
+  @callback health_check() :: {:ok, :healthy} | {:error, error()}
+
   # Public API - delegates to configured adapter
 
   @doc """
@@ -163,6 +218,81 @@ defmodule Ingot.AnvilClient do
   Legacy API - maintained for backward compatibility.
   """
   def session_labels(session_id), do: adapter().session_labels(session_id)
+
+  # Auth API delegation
+
+  @doc """
+  Upsert a user (create or update).
+
+  ## Examples
+
+      iex> AnvilClient.upsert_user(%{external_id: "oidc_123", email: "user@example.com", name: "User"})
+      {:ok, %{id: "user_123", external_id: "oidc_123", ...}}
+  """
+  def upsert_user(attrs), do: adapter().upsert_user(attrs)
+
+  @doc """
+  Get user roles.
+
+  ## Examples
+
+      iex> AnvilClient.get_user_roles("user_123")
+      {:ok, [%{role: :labeler, scope: "queue:abc"}, ...]}
+  """
+  def get_user_roles(user_id), do: adapter().get_user_roles(user_id)
+
+  @doc """
+  Check if user has access to a queue.
+
+  ## Examples
+
+      iex> AnvilClient.check_queue_access("user_123", "queue_abc")
+      {:ok, true}
+  """
+  def check_queue_access(user_id, queue_id), do: adapter().check_queue_access(user_id, queue_id)
+
+  @doc """
+  Create an invite code for a queue.
+
+  ## Examples
+
+      iex> AnvilClient.create_invite(%{queue_id: "queue_abc", role: :labeler, max_uses: 10})
+      {:ok, %{code: "ABCD1234WXYZ", queue_id: "queue_abc", ...}}
+  """
+  def create_invite(attrs), do: adapter().create_invite(attrs)
+
+  @doc """
+  Get invite by code.
+
+  ## Examples
+
+      iex> AnvilClient.get_invite("ABCD1234WXYZ")
+      {:ok, %{code: "ABCD1234WXYZ", queue_id: "queue_abc", ...}}
+  """
+  def get_invite(code), do: adapter().get_invite(code)
+
+  @doc """
+  Redeem an invite code.
+
+  ## Examples
+
+      iex> AnvilClient.redeem_invite("ABCD1234WXYZ", %{email: "labeler@example.com", name: "Labeler"})
+      {:ok, %{user: %{id: "user_123", ...}, queue_id: "queue_abc", role: :labeler}}
+  """
+  def redeem_invite(code, user_attrs), do: adapter().redeem_invite(code, user_attrs)
+
+  @doc """
+  Health check for Anvil service.
+
+  ## Examples
+
+      iex> AnvilClient.health_check()
+      {:ok, :healthy}
+
+      iex> AnvilClient.health_check()
+      {:error, :not_available}
+  """
+  def health_check, do: adapter().health_check()
 
   # Private helpers
 

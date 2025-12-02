@@ -33,7 +33,7 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "example.com"
+  host = System.get_env("PHX_HOST") || "ingot.nsai.io"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :ingot, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
@@ -49,6 +49,57 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: secret_key_base
+
+  # Database Configuration (optional - Ingot is stateless by default)
+  # If DATABASE_URL is provided, configure Ecto
+  if database_url = System.get_env("DATABASE_URL") do
+    config :ingot, Ingot.Repo,
+      url: database_url,
+      pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+      ssl: System.get_env("DATABASE_SSL") == "true"
+  end
+
+  # Forge Client Configuration
+  config :ingot,
+    forge_base_url: System.get_env("FORGE_URL"),
+    forge_timeout: String.to_integer(System.get_env("FORGE_TIMEOUT_MS") || "5000")
+
+  # Anvil Client Configuration
+  config :ingot,
+    anvil_base_url: System.get_env("ANVIL_URL"),
+    anvil_timeout: String.to_integer(System.get_env("ANVIL_TIMEOUT_MS") || "5000")
+
+  # OIDC Authentication Configuration (optional)
+  if oidc_client_id = System.get_env("OIDC_CLIENT_ID") do
+    config :ingot, :oidc,
+      provider:
+        System.get_env("OIDC_PROVIDER") ||
+          raise("OIDC_PROVIDER is required when OIDC_CLIENT_ID is set"),
+      client_id: oidc_client_id,
+      client_secret:
+        System.get_env("OIDC_CLIENT_SECRET") ||
+          raise("OIDC_CLIENT_SECRET is required when OIDC_CLIENT_ID is set"),
+      redirect_uri: System.get_env("OIDC_REDIRECT_URI", "https://#{host}/auth/callback")
+  end
+
+  # AWS S3 Configuration (for artifact URLs - optional)
+  if access_key_id = System.get_env("AWS_ACCESS_KEY_ID") do
+    config :ex_aws,
+      access_key_id: access_key_id,
+      secret_access_key:
+        System.get_env("AWS_SECRET_ACCESS_KEY") ||
+          raise("AWS_SECRET_ACCESS_KEY is required when AWS_ACCESS_KEY_ID is set"),
+      region: System.get_env("AWS_REGION", "us-east-1")
+  end
+
+  # Telemetry Configuration
+  config :ingot, :telemetry,
+    prometheus_enabled: System.get_env("PROMETHEUS_ENABLED", "true") == "true",
+    log_level: String.to_atom(System.get_env("LOG_LEVEL") || "info")
+
+  # Logging Configuration
+  config :logger,
+    level: String.to_atom(System.get_env("LOG_LEVEL") || "info")
 
   # ## SSL Support
   #

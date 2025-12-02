@@ -11,11 +11,16 @@ defmodule Ingot.Application do
       IngotWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:ingot, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Ingot.PubSub},
+      # Start ComponentRegistry for pluggable components
+      {Ingot.Components.ComponentRegistry, []},
       # Start a worker by calling: Ingot.Worker.start_link(arg)
       # {Ingot.Worker, arg},
       # Start to serve requests, typically the last entry
       IngotWeb.Endpoint
     ]
+
+    # Attach telemetry handler for Ingot, Forge, and Anvil events
+    Ingot.TelemetryHandler.attach()
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

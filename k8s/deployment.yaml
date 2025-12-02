@@ -1,0 +1,168 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingot
+  namespace: research
+  labels:
+    app: ingot
+    component: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ingot
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: ingot
+        version: "1.0.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "4000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: ingot
+        image: gcr.io/nsai/ingot:1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 4000
+          name: http
+          protocol: TCP
+        env:
+        # Phoenix Configuration
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: ingot-secrets
+              key: secret-key-base
+        - name: PHX_HOST
+          value: "ingot.nsai.io"
+        - name: PORT
+          value: "4000"
+        - name: PHX_SERVER
+          value: "true"
+
+        # Database Configuration (optional - Ingot is stateless by default)
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ingot-secrets
+              key: database-url
+              optional: true
+        - name: POOL_SIZE
+          value: "10"
+
+        # Forge Client Configuration
+        - name: FORGE_URL
+          value: "http://forge.research.svc.cluster.local:4001"
+        - name: FORGE_ADAPTER
+          value: "elixir"
+        - name: FORGE_TIMEOUT_MS
+          value: "5000"
+
+        # Anvil Client Configuration
+        - name: ANVIL_URL
+          value: "http://anvil.research.svc.cluster.local:4002"
+        - name: ANVIL_ADAPTER
+          value: "elixir"
+        - name: ANVIL_TIMEOUT_MS
+          value: "5000"
+
+        # AWS S3 Configuration (for artifact URLs)
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-credentials
+              key: access-key-id
+              optional: true
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-credentials
+              key: secret-access-key
+              optional: true
+        - name: AWS_REGION
+          value: "us-east-1"
+
+        # OIDC Authentication Configuration (optional)
+        - name: OIDC_PROVIDER
+          value: "https://auth.nsai.io"
+        - name: OIDC_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: oidc-secrets
+              key: client-id
+              optional: true
+        - name: OIDC_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: oidc-secrets
+              key: client-secret
+              optional: true
+        - name: OIDC_REDIRECT_URI
+          value: "https://ingot.nsai.io/auth/callback"
+
+        # Telemetry Configuration
+        - name: PROMETHEUS_ENABLED
+          value: "true"
+        - name: LOG_LEVEL
+          value: "info"
+
+        # DNS Cluster Configuration (optional)
+        - name: DNS_CLUSTER_QUERY
+          value: "ingot.research.svc.cluster.local"
+
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 4000
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 4000
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/app/bin/ingot", "rpc", "Ingot.GracefulShutdown.drain()"]
+
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 35
+      securityContext:
+        fsGroup: 1000

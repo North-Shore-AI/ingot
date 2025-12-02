@@ -98,4 +98,10 @@ defmodule Ingot.ForgeClient.MockAdapter do
   def generate_batch(count) do
     {:ok, count}
   end
+
+  @impl true
+  def health_check do
+    # Mock adapter is always healthy
+    {:ok, :healthy}
+  end
 end

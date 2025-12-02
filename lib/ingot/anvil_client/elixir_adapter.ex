@@ -100,6 +100,72 @@ defmodule Ingot.AnvilClient.ElixirAdapter do
     _ -> []
   end
 
+  # Auth API implementation
+
+  @impl true
+  def upsert_user(_attrs) do
+    # TODO: Integrate with Anvil when available
+    {:error, :not_available}
+  rescue
+    UndefinedFunctionError -> {:error, :not_available}
+    _ -> {:error, {:unexpected, :anvil_error}}
+  end
+
+  @impl true
+  def get_user_roles(_user_id) do
+    # TODO: Integrate with Anvil when available
+    {:error, :not_available}
+  rescue
+    UndefinedFunctionError -> {:error, :not_available}
+    _ -> {:error, {:unexpected, :anvil_error}}
+  end
+
+  @impl true
+  def check_queue_access(_user_id, _queue_id) do
+    # TODO: Integrate with Anvil when available
+    {:error, :not_available}
+  rescue
+    UndefinedFunctionError -> {:error, :not_available}
+    _ -> {:error, {:unexpected, :anvil_error}}
+  end
+
+  @impl true
+  def create_invite(_attrs) do
+    # TODO: Integrate with Anvil when available
+    {:error, :not_available}
+  rescue
+    UndefinedFunctionError -> {:error, :not_available}
+    _ -> {:error, {:unexpected, :anvil_error}}
+  end
+
+  @impl true
+  def get_invite(_code) do
+    # TODO: Integrate with Anvil when available
+    {:error, :not_found}
+  rescue
+    UndefinedFunctionError -> {:error, :not_found}
+    _ -> {:error, {:unexpected, :anvil_error}}
+  end
+
+  @impl true
+  def redeem_invite(_code, _user_attrs) do
+    # TODO: Integrate with Anvil when available
+    {:error, :not_available}
+  rescue
+    UndefinedFunctionError -> {:error, :not_available}
+    _ -> {:error, {:unexpected, :anvil_error}}
+  end
+
+  @impl true
+  def health_check do
+    # TODO: When Anvil is integrated, add a proper health check
+    # For now, return :not_available since Anvil is not integrated
+    {:error, :not_available}
+  rescue
+    UndefinedFunctionError -> {:error, :not_available}
+    _ -> {:error, {:unexpected, :anvil_error}}
+  end
+
   # Private helpers for DTO translation (to be implemented when integrating)
 
   # defp to_assignment_dto(%Anvil.Assignment{} = assignment) do

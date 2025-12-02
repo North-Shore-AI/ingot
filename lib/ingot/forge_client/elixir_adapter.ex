@@ -70,6 +70,16 @@ defmodule Ingot.ForgeClient.ElixirAdapter do
     {:error, :not_available}
   end
 
+  @impl true
+  def health_check do
+    # TODO: When Forge is integrated, add a proper health check
+    # For now, return :not_available since Forge is not integrated
+    {:error, :not_available}
+  rescue
+    UndefinedFunctionError -> {:error, :not_available}
+    _ -> {:error, {:unexpected, :forge_error}}
+  end
+
   # Private helpers for DTO translation (to be implemented when integrating)
 
   # defp to_sample_dto(%Forge.Sample{} = sample) do

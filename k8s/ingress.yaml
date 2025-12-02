@@ -1,0 +1,56 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingot
+  namespace: research
+  labels:
+    app: ingot
+    component: web
+  annotations:
+    # TLS certificate management
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+    # Sticky sessions for LiveView WebSocket connections
+    # This ensures WebSocket reconnections go to the same backend pod
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "ingot_affinity"
+    nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "10800"  # 3 hours
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "10800"
+
+    # WebSocket support
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+
+    # Security headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains";
+
+    # Request size limits
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+
+    # Force HTTPS
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+    # Rate limiting (optional)
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - ingot.nsai.io
+    secretName: ingot-tls
+  rules:
+  - host: ingot.nsai.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ingot
+            port:
+              number: 80

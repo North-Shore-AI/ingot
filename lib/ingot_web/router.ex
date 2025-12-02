@@ -14,6 +14,21 @@ defmodule IngotWeb.Router do
     plug :accepts, ["json"]
   end
 
+  # Auth pipelines
+  pipeline :require_auth do
+    plug IngotWeb.Plugs.RequireAuth
+  end
+
+  pipeline :require_labeler do
+    plug IngotWeb.Plugs.RequireAuth
+    plug IngotWeb.Plugs.RequireRole, role: :labeler
+  end
+
+  pipeline :require_admin do
+    plug IngotWeb.Plugs.RequireAuth
+    plug IngotWeb.Plugs.RequireRole, role: :admin
+  end
+
   scope "/", IngotWeb do
     pipe_through :browser
 
@@ -21,6 +36,26 @@ defmodule IngotWeb.Router do
     live "/label", LabelingLive, :index
     live "/dashboard", DashboardLive, :index
   end
+
+  # Health check endpoint (no auth required)
+  scope "/", IngotWeb do
+    pipe_through :api
+
+    get "/health", HealthController, :index
+  end
+
+  # Example of protected routes (uncomment to enable auth)
+  # scope "/", IngotWeb do
+  #   pipe_through [:browser, :require_auth]
+  #
+  #   live "/dashboard", DashboardLive, :index
+  # end
+  #
+  # scope "/", IngotWeb do
+  #   pipe_through [:browser, :require_labeler]
+  #
+  #   live "/label", LabelingLive, :index
+  # end
 
   # Other scopes may use custom stacks.
   # scope "/api", IngotWeb do

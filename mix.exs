@@ -19,7 +19,8 @@ defmodule Ingot.MixProject do
       source_url: @source_url,
       homepage_url: @source_url,
       docs: docs(),
-      dialyzer: dialyzer()
+      dialyzer: dialyzer(),
+      releases: releases()
     ]
   end
 
@@ -138,7 +139,18 @@ defmodule Ingot.MixProject do
   defp dialyzer do
     [
       plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
-      plt_add_apps: [:mix, :ex_unit, :ecto, :ecto_sql]
+      plt_add_apps: [:mix, :ex_unit, :ecto, :ecto_sql],
+      ignore_warnings: ".dialyzer_ignore.exs"
+    ]
+  end
+
+  defp releases do
+    [
+      ingot: [
+        include_executables_for: [:unix],
+        applications: [runtime_tools: :permanent],
+        steps: [:assemble, :tar]
+      ]
     ]
   end
 end
