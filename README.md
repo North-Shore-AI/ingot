@@ -6,7 +6,11 @@
 
 </div>
 
-[![GitHub](https://img.shields.io/badge/github-North--Shore--AI%2Fingot-blue)](https://github.com/North-Shore-AI/ingot)
+[![Hex.pm](https://img.shields.io/hexpm/v/ingot.svg)](https://hex.pm/packages/ingot)
+[![Documentation](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/ingot)
+[![Downloads](https://img.shields.io/hexpm/dt/ingot.svg)](https://hex.pm/packages/ingot)
+[![License](https://img.shields.io/github/license/North-Shore-AI/ingot.svg)](LICENSE)
+[![GitHub](https://img.shields.io/badge/github-North--Shore--AI%2Fingot-blue?logo=github)](https://github.com/North-Shore-AI/ingot)
 
 Ingot is a Phoenix LiveView application for **sample generation** and **human labeling workflows**, built on top of [Forge](https://hex.pm/packages/forge_ex) and [Anvil](https://hex.pm/packages/anvil_ex).
 

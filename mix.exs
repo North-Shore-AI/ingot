@@ -98,7 +98,7 @@ defmodule Ingot.MixProject do
       main: "readme",
       assets: %{"assets" => "assets"},
       logo: "assets/ingot.svg",
-      extras: ["README.md", "CHANGELOG.md"],
+      extras: ["README.md", "CHANGELOG.md", "LICENSE"],
       source_ref: "v#{@version}",
       source_url: @source_url,
       groups_for_modules: [
