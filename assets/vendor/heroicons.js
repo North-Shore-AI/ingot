@@ -8,8 +8,6 @@ module.exports = plugin(function({matchComponents, theme}) {
   let values = {}
   let icons = [
     ["", "/24/outline"],
-    ["-solid", "/24/solid"],
-    ["-mini", "/20/solid"],
     ["-micro", "/16/solid"]
   ]
   icons.forEach(([suffix, dir]) => {
