@@ -8,7 +8,9 @@
 import Config
 
 config :ingot,
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime],
+  forge_client_adapter: Ingot.ForgeClient.MockAdapter,
+  anvil_client_adapter: Ingot.AnvilClient.MockAdapter
 
 # Configures the endpoint
 config :ingot, IngotWeb.Endpoint,

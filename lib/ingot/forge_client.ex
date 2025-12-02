@@ -1,10 +1,92 @@
 defmodule Ingot.ForgeClient do
   @moduledoc """
-  Client for interacting with Forge sample generation library.
+  Behaviour for fetching samples and artifacts from Forge.
 
-  This is a thin wrapper that delegates all logic to Forge.
-  Ingot contains no sample generation logic itself.
+  Ingot uses read-only operations; no sample creation/mutation.
+  Supports pluggable adapters for different deployment scenarios:
+  - MockAdapter: For testing without running Forge
+  - ElixirAdapter: Direct in-process calls when deployed together
+  - HTTPAdapter: REST API calls for separate deployments (future)
   """
+
+  alias Ingot.DTO.{Sample, Artifact}
+
+  @type sample_id :: String.t()
+  @type error :: :not_found | :timeout | :network | {:unexpected, term()}
+
+  @doc """
+  Fetch a sample by ID.
+
+  Returns the sample DTO with embedded artifacts and metadata.
+  """
+  @callback get_sample(sample_id) :: {:ok, Sample.t()} | {:error, error()}
+
+  @doc """
+  Fetch all artifacts for a sample.
+
+  Artifacts are media files (images, audio, etc.) with signed URLs.
+  """
+  @callback get_artifacts(sample_id) :: {:ok, [Artifact.t()]} | {:error, error()}
+
+  @doc """
+  Get queue statistics.
+
+  Returns aggregate statistics about sample queues.
+  """
+  @callback queue_stats() :: {:ok, map()} | {:error, error()}
+
+  # Legacy API support (for backward compatibility with existing code)
+  @doc """
+  Fetch next sample from queue for the given user.
+
+  Legacy API - maintained for backward compatibility.
+  """
+  @callback fetch_next_sample(user_id :: String.t()) ::
+              {:ok, map()} | {:error, :queue_empty}
+
+  @doc """
+  Mark sample as skipped by the user.
+
+  Legacy API - maintained for backward compatibility.
+  """
+  @callback skip_sample(sample_id, user_id :: String.t()) :: :ok
+
+  # Public API - delegates to configured adapter
+
+  @doc """
+  Fetch a sample by ID.
+
+  ## Examples
+
+      iex> ForgeClient.get_sample("sample-123")
+      {:ok, %Ingot.DTO.Sample{id: "sample-123", ...}}
+
+      iex> ForgeClient.get_sample("nonexistent")
+      {:error, :not_found}
+  """
+  def get_sample(sample_id), do: adapter().get_sample(sample_id)
+
+  @doc """
+  Fetch all artifacts for a sample.
+
+  ## Examples
+
+      iex> ForgeClient.get_artifacts("sample-123")
+      {:ok, [%Ingot.DTO.Artifact{...}]}
+  """
+  def get_artifacts(sample_id), do: adapter().get_artifacts(sample_id)
+
+  @doc """
+  Get queue statistics.
+
+  ## Examples
+
+      iex> ForgeClient.queue_stats()
+      {:ok, %{total: 100, completed: 50, remaining: 50}}
+  """
+  def queue_stats, do: adapter().queue_stats()
+
+  # Legacy API delegation
 
   @doc """
   Fetch next sample from queue for the given user.
@@ -12,29 +94,9 @@ defmodule Ingot.ForgeClient do
   ## Examples
 
       iex> ForgeClient.fetch_next_sample("user-123")
-      {:ok, %{id: "sample-1", narrative_a: "...", narrative_b: "...", synthesis: "..."}}
-
-      iex> ForgeClient.fetch_next_sample("user-123")
-      {:error, :queue_empty}
+      {:ok, %{id: "sample-1", narrative_a: "...", ...}}
   """
-  def fetch_next_sample(_user_id) do
-    # Mock implementation - will be replaced with actual Forge integration
-    {:ok,
-     %{
-       id: "sample-#{:rand.uniform(1000)}",
-       narrative_a:
-         "Narrative A presents a perspective focusing on economic growth and technological innovation as primary drivers of progress.",
-       narrative_b:
-         "Narrative B emphasizes environmental sustainability and social equity as essential foundations for long-term prosperity.",
-       synthesis:
-         "A balanced approach recognizes that economic growth and environmental sustainability are not mutually exclusive but rather interdependent. Technological innovation can drive both economic advancement and ecological preservation when directed toward sustainable practices. Social equity ensures that the benefits of progress are shared broadly, creating stable foundations for continued development.",
-       metadata: %{
-         generated_at: DateTime.utc_now(),
-         model: "gpt-4",
-         temperature: 0.7
-       }
-     }}
-  end
+  def fetch_next_sample(user_id), do: adapter().fetch_next_sample(user_id)
 
   @doc """
   Mark sample as skipped by the user.
@@ -44,38 +106,18 @@ defmodule Ingot.ForgeClient do
       iex> ForgeClient.skip_sample("sample-1", "user-123")
       :ok
   """
-  def skip_sample(_sample_id, _user_id) do
-    # Mock implementation
-    :ok
-  end
-
-  @doc """
-  Get queue statistics.
-
-  ## Examples
-
-      iex> ForgeClient.queue_stats()
-      %{total: 500, completed: 47, remaining: 453}
-  """
-  def queue_stats do
-    # Mock implementation
-    %{
-      total: 500,
-      completed: 47,
-      remaining: 453
-    }
-  end
+  def skip_sample(sample_id, user_id), do: adapter().skip_sample(sample_id, user_id)
 
   @doc """
   Generate new batch of samples.
 
-  ## Examples
-
-      iex> ForgeClient.generate_batch(10)
-      {:ok, 10}
+  Legacy API - maintained for backward compatibility.
   """
-  def generate_batch(count) do
-    # Mock implementation
-    {:ok, count}
+  def generate_batch(count), do: adapter().generate_batch(count)
+
+  # Private helpers
+
+  defp adapter do
+    Application.get_env(:ingot, :forge_client_adapter, Ingot.ForgeClient.MockAdapter)
   end
 end

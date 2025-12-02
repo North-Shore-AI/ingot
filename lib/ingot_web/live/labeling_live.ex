@@ -21,7 +21,7 @@ defmodule IngotWeb.LabelingLive do
       |> assign(:labels_this_session, 0)
       |> assign(:total_labels, AnvilClient.total_labels())
       |> assign(:active_labelers, 1)
-      |> assign(:queue_stats, ForgeClient.queue_stats())
+      |> assign(:queue_stats, get_queue_stats())
       |> assign(:focused_dimension, :coherence)
 
     if connected?(socket) do
@@ -170,10 +170,30 @@ defmodule IngotWeb.LabelingLive do
     "session-#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
   end
 
+  defp get_queue_stats do
+    case ForgeClient.queue_stats() do
+      {:ok, stats} -> stats
+      _ -> %{total: 0, completed: 0, remaining: 0}
+    end
+  end
+
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="min-h-screen bg-gray-50 py-8">
+    <div
+      class="min-h-screen bg-gray-50 py-8"
+      data-user-id={@user_id}
+      data-session-id={@session_id}
+      data-sample-id={@current_sample && @current_sample.id}
+      data-focused-dimension={@focused_dimension}
+      data-timer-active={to_string(@timer_started_at != nil)}
+      data-total-labels={@total_labels}
+      data-active-labelers={@active_labelers}
+      data-coherence-rating={@ratings[:coherence]}
+      data-grounded-rating={@ratings[:grounded]}
+      data-novel-rating={@ratings[:novel]}
+      data-balanced-rating={@ratings[:balanced]}
+    >
       <div class="max-w-4xl mx-auto px-4">
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
           <!-- Header -->
@@ -194,6 +214,24 @@ defmodule IngotWeb.LabelingLive do
               </button>
             </div>
           </div>
+          
+    <!-- Flash Messages -->
+          <%= if Phoenix.Flash.get(@flash, :error) do %>
+            <div
+              class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mx-6 mt-4"
+              role="alert"
+            >
+              <span class="block sm:inline">{Phoenix.Flash.get(@flash, :error)}</span>
+            </div>
+          <% end %>
+          <%= if Phoenix.Flash.get(@flash, :info) do %>
+            <div
+              class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mx-6 mt-4"
+              role="alert"
+            >
+              <span class="block sm:inline">{Phoenix.Flash.get(@flash, :info)}</span>
+            </div>
+          <% end %>
           
     <!-- Main Content -->
           <div class="p-6 space-y-6">

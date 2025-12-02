@@ -10,5 +10,14 @@ config :ingot, IngotWeb.Endpoint, cache_static_manifest: "priv/static/cache_mani
 # Do not print debug messages in production
 config :logger, level: :info
 
+# Configure mock adapters for production (until Forge/Anvil are integrated)
+# When ready for real integration, switch to ElixirAdapter:
+# config :ingot,
+#   forge_client_adapter: Ingot.ForgeClient.ElixirAdapter,
+#   anvil_client_adapter: Ingot.AnvilClient.ElixirAdapter
+config :ingot,
+  forge_client_adapter: Ingot.ForgeClient.MockAdapter,
+  anvil_client_adapter: Ingot.AnvilClient.MockAdapter
+
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.

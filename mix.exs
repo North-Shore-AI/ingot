@@ -45,6 +45,7 @@ defmodule Ingot.MixProject do
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.20 or ~> 1.0"},
       {:floki, ">= 0.30.0", only: :test},
+      {:lazy_html, ">= 0.1.0", only: :test},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:heroicons,
@@ -60,8 +61,8 @@ defmodule Ingot.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1"},
       {:bandit, "~> 1.5"},
-      {:forge_ex, "~> 0.1", optional: true},
-      {:anvil_ex, "~> 0.1", optional: true},
+      {:forge, path: "../forge", optional: true, runtime: false},
+      {:anvil, path: "../anvil", optional: true, runtime: false},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
       {:supertester, "~> 0.3.1", only: :test}
     ]

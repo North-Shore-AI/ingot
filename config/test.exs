@@ -16,3 +16,8 @@ config :phoenix, :plug_init_mode, :runtime
 # Enable helpful, but potentially expensive runtime checks
 config :phoenix_live_view,
   enable_expensive_runtime_checks: true
+
+# Configure mock adapters for testing
+config :ingot,
+  forge_client_adapter: Ingot.ForgeClient.MockAdapter,
+  anvil_client_adapter: Ingot.AnvilClient.MockAdapter

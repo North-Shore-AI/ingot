@@ -8,7 +8,7 @@ defmodule IngotWeb.DashboardLive do
     socket =
       socket
       |> assign(:statistics, AnvilClient.statistics())
-      |> assign(:queue_stats, ForgeClient.queue_stats())
+      |> assign(:queue_stats, get_queue_stats())
       |> assign(:active_labelers, 0)
       |> assign(:last_updated, DateTime.utc_now())
 
@@ -64,8 +64,15 @@ defmodule IngotWeb.DashboardLive do
   defp refresh_statistics(socket) do
     socket
     |> assign(:statistics, AnvilClient.statistics())
-    |> assign(:queue_stats, ForgeClient.queue_stats())
+    |> assign(:queue_stats, get_queue_stats())
     |> assign(:last_updated, DateTime.utc_now())
+  end
+
+  defp get_queue_stats do
+    case ForgeClient.queue_stats() do
+      {:ok, stats} -> stats
+      _ -> %{total: 0, completed: 0, remaining: 0}
+    end
   end
 
   defp schedule_refresh do

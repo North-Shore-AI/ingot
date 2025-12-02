@@ -8,90 +8,107 @@
 
 [![GitHub](https://img.shields.io/badge/github-North--Shore--AI%2Fingot-blue)](https://github.com/North-Shore-AI/ingot)
 
-A Phoenix LiveView interface for sample generation and human labeling workflows. Ingot provides a thin, elegant wrapper around the [Forge](../forge) and [Anvil](../anvil) libraries, exposing their functionality through an intuitive web interface.
+Ingot is a Phoenix LiveView application for **sample generation** and **human labeling workflows**, built on top of [Forge](../forge) and [Anvil](../anvil).
 
-## Purpose
+In a world already full of perfectly good data labeling tools, Ingot is the one that runs on the BEAM for reasons that, in hindsight, appear to be *intentional*.
 
-Ingot is designed as a **minimal, thin wrapper** that:
+---
 
-- Provides a web-based interface for human labeling tasks
-- Delegates all business logic to Forge (sample generation) and Anvil (label storage)
-- Manages user sessions and labeling workflows
-- Displays real-time progress and queue status
-- Offers keyboard shortcuts for efficient labeling
+## What is Ingot?
 
-**Design Philosophy**: Ingot contains minimal logic itself. It orchestrates calls to Forge and Anvil, focusing exclusively on presentation and user interaction.
+Ingot is a **thin web shell** around two Elixir libraries:
+
+- **[Forge](../forge)** – creates and manages *samples* via pipelines
+- **[Anvil](../anvil)** – manages human labeling queues, assignments, labels, and agreements
+
+Ingot’s job is to:
+
+- Render labeling UIs (via LiveView) from Anvil label schemas
+- Surface pipelines, queues, and agreement metrics in a browser
+- Handle sessions, auth, and user flows for labelers and admins
+- Stay out of the way of your actual business logic
+
+Think of it as the **UI layer** that turns Forge + Anvil into a usable product, without smuggling any domain logic into Phoenix.
+
+---
 
 ## Features
 
 ### LiveView Labeling Interface
-- **Real-time labeling UI**: Rate narrative synthesis samples on multiple dimensions
-- **Keyboard shortcuts**: Navigate and label efficiently without touching the mouse
-- **Progress tracking**: See your labeling progress in real-time
-- **Skip functionality**: Skip problematic or ambiguous samples
-- **Timer tracking**: Record time spent on each labeling task
 
-### Rating Dimensions
-- **Coherence**: How well does the synthesis integrate both narratives?
-- **Grounded**: Is the synthesis supported by the source narratives?
-- **Novel**: Does the synthesis add new insights beyond simple summary?
-- **Balanced**: Does the synthesis give fair weight to both perspectives?
+- Schema-driven UI from Anvil label definitions
+- Real-time updates via LiveView and PubSub
+- Keyboard-first labeling (minimal mouse usage)
+- Skip / flagging for problematic samples
+- Optional per-sample timing and basic analytics
 
-### Admin Dashboard
-- View overall labeling statistics
-- Monitor queue progress
-- Track labeler performance
-- Export labeled data
+### Admin & Monitoring
 
-### Real-time Updates
-- Phoenix PubSub for live progress updates
-- Automatic UI refresh when new samples are available
-- Real-time labeler count display
+- Queue and pipeline status pages
+- Labeler activity and velocity
+- Agreement metrics surface (Cohen/Fleiss/… via Anvil)
+- Export hooks for downstream training / analysis
+
+### Workflow Characteristics
+
+- Stateless HTTP on the edge, supervised processes underneath
+- Backed by Forge samples and Anvil queues
+- Plays nicely with your existing Elixir stack, telemetry, and job runners
+
+---
+
+## When to Use Ingot
+
+You might want Ingot if:
+
+- You already use or want to use **Forge** and **Anvil**
+- You want a **self-hosted**, Elixir-native labeling UI
+- You prefer **LiveView** over a separate SPA frontend
+- You enjoy the perverse satisfaction of saying _“yes, our data labeling platform is written in Elixir”_ and having it be factually correct
+
+You probably *don’t* want Ingot if you just need a generic labeling SaaS in five minutes. There are plenty of those.
+
+---
 
 ## Installation
 
 ### Prerequisites
 
-- Elixir 1.15 or later
-- Erlang/OTP 26 or later
-- Node.js 18+ (for asset compilation)
-- Forge and Anvil libraries (sibling directories)
+- Elixir **1.15+**
+- Erlang/OTP **26+**
+- Node.js **18+** (for asset compilation)
+- `forge/` and `anvil/` available as sibling directories or deps
 
 ### Setup
 
-1. Clone the repository:
 ```bash
 git clone https://github.com/North-Shore-AI/ingot.git
 cd ingot
-```
+````
 
-2. Install dependencies:
+Install dependencies:
+
 ```bash
 mix setup
 ```
 
-3. Start the Phoenix server:
+Start the Phoenix server:
+
 ```bash
 mix phx.server
-```
-
-4. Visit [`localhost:4000`](http://localhost:4000) in your browser.
-
-Alternatively, run inside IEx for debugging:
-```bash
+# or
 iex -S mix phx.server
 ```
 
+Then open [`http://localhost:4000`](http://localhost:4000).
+
+---
+
 ## Configuration
 
-Configuration options are available in `config/`:
+Application configuration lives under `config/`.
 
-- `config/config.exs` - General application configuration
-- `config/dev.exs` - Development environment settings
-- `config/prod.exs` - Production environment settings
-- `config/test.exs` - Test environment settings
-
-### Key Configuration Options
+Key options:
 
 ```elixir
 # config/config.exs
@@ -99,80 +116,60 @@ config :ingot,
   # Session timeout in milliseconds
   session_timeout: :timer.hours(2),
 
-  # Maximum samples per session
+  # Maximum samples per labeling session
   max_samples_per_session: 500,
 
   # Enable/disable keyboard shortcuts
   keyboard_shortcuts_enabled: true
 ```
 
+You’ll also need to configure Forge and Anvil (pipelines, queues, label schemas) in your umbrella or host application.
+
+---
+
 ## Usage
 
-### Labeling Workflow
+### 1. Define Samples and Queues
 
-1. Navigate to the labeling interface at `/label`
-2. Review the two source narratives (A and B)
-3. Read the synthesis text
-4. Rate the synthesis on each dimension (1-5 scale)
-5. Optionally add notes in the text field
-6. Submit and proceed to the next sample
+In your Elixir app (outside Ingot):
 
-### Keyboard Shortcuts
+* Use **Forge** to define pipelines and produce samples.
+* Use **Anvil** to define label schemas and queues referencing those samples.
 
-- **1-5**: Quick rating for focused dimension
-- **Tab**: Navigate between rating dimensions
-- **Enter**: Submit current label and load next sample
-- **S**: Skip current sample
-- **Q**: Quit labeling session
+Ingot doesn’t care about the domain; it just talks to Forge/Anvil.
 
-### Admin Dashboard
+### 2. Labeling Flow (Labeler View)
 
-Access the admin dashboard at `/dashboard` to:
+By default:
 
-- View total labeled samples
-- Monitor active labelers
-- Check queue depth
-- Export labeled datasets
-- View labeling velocity metrics
+1. Navigate to `/label`
+2. Ingot fetches the next assignment from Anvil
+3. LiveView renders the form derived from the label schema
+4. Labeler completes fields / ratings (keyboard shortcuts where enabled)
+5. Submit → Ingot writes labels via Anvil → next assignment
 
-## Screenshots
+Typical keyboard shortcuts (configurable):
 
-> Coming soon
+* `1–5` – quick rating on focused dimension
+* `Tab` – move between fields
+* `Enter` – submit
+* `S` – skip sample
+* `Q` – end session
 
-## Testing
+### 3. Admin Flow
 
-Run the full test suite:
+Navigate to `/dashboard` to:
 
-```bash
-mix test
-```
+* Inspect queue depth and throughput
+* See active labelers and recent activity
+* View basic agreement metrics exposed by Anvil
+* Trigger or link out to exports for downstream pipelines
 
-Run tests with coverage:
-
-```bash
-mix test --cover
-```
-
-Run precommit checks (compile, format, test):
-
-```bash
-mix precommit
-```
-
-## Architecture
-
-See [Architecture Decision Records](docs/adrs/) for detailed design decisions:
-
-- [ADR-001: Thin Wrapper Architecture](docs/adrs/001-thin-wrapper-architecture.md)
-- [ADR-002: LiveView Labeling Interface Design](docs/adrs/002-liveview-labeling-interface.md)
-- [ADR-003: Session Management Strategy](docs/adrs/003-session-management.md)
-- [ADR-004: Real-time Progress Updates](docs/adrs/004-realtime-progress-updates.md)
-- [ADR-005: Keyboard Shortcuts for Labeling](docs/adrs/005-keyboard-shortcuts.md)
-- [ADR-006: Integration with Forge and Anvil](docs/adrs/006-forge-anvil-integration.md)
+---
 
 ## Project Structure
 
-```
+```text
 ingot/
 ├── lib/
 │   ├── ingot/
@@ -181,39 +178,80 @@ ingot/
 │       ├── components/
 │       │   └── core_components.ex  # Shared UI components
 │       ├── live/
-│       │   ├── labeling_live.ex    # Main labeling interface
+│       │   ├── labeling_live.ex    # Labeling interface
 │       │   ├── dashboard_live.ex   # Admin dashboard
 │       │   └── components/
 │       │       ├── sample_component.ex
 │       │       ├── label_form_component.ex
 │       │       └── progress_component.ex
-│       ├── router.ex               # Route definitions
+│       ├── router.ex               # Routes
 │       └── endpoint.ex             # Phoenix endpoint
-├── test/
-│   └── ingot_web/
-│       └── live/                   # LiveView tests
+├── assets/                         # Frontend assets
 ├── docs/
-│   └── adrs/                       # Architecture decisions
-└── assets/                         # Frontend assets
+│   └── adrs/                       # Architecture decision records
+└── test/
+    └── ingot_web/
+        └── live/                   # LiveView tests
 ```
+
+---
+
+## Testing
+
+Run the test suite:
+
+```bash
+mix test
+```
+
+With coverage:
+
+```bash
+mix test --cover
+```
+
+Precommit-style checks (format, compile, test) if wired:
+
+```bash
+mix precommit
+```
+
+---
+
+## Architecture Notes
+
+Detailed decisions live in `docs/adrs/`, including:
+
+* Thin wrapper architecture over Forge/Anvil
+* LiveView-first UI design
+* Session management and time tracking
+* Real-time updates via PubSub
+* Integration boundaries with Forge and Anvil
+
+The short version: Phoenix only does presentation and request orchestration; the actual thinking happens in the libraries.
+
+---
 
 ## Dependencies
 
-- **Phoenix**: Web framework
-- **Phoenix LiveView**: Real-time UI components
-- **Forge**: Sample generation library (path dependency)
-- **Anvil**: Label storage library (path dependency)
-- **Supertester**: Enhanced testing framework
+* **Phoenix** – Web framework
+* **Phoenix LiveView** – Real-time UI
+* **Forge** – Sample generation and pipelines
+* **Anvil** – Labeling queues, labels, agreements
+
+---
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Run tests (`mix precommit`)
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+If you, too, feel that the universe needed a BEAM-native data labeling UI:
+
+1. Fork the repo
+2. Create a branch: `git checkout -b feature/thing`
+3. Make changes
+4. Run tests: `mix precommit` (or at least `mix test`)
+5. Open a PR
+
+---
 
 ## License
 
@@ -221,14 +259,14 @@ Copyright (c) 2025 North Shore AI
 
 This project is part of the North Shore AI organization.
 
+---
+
 ## Links
 
-- **GitHub**: https://github.com/North-Shore-AI/ingot
-- **Forge**: https://github.com/North-Shore-AI/forge
-- **Anvil**: https://github.com/North-Shore-AI/anvil
-- **Phoenix Framework**: https://www.phoenixframework.org/
-- **Phoenix LiveView**: https://hexdocs.pm/phoenix_live_view/
-
-## Contact
+* Ingot: [https://github.com/North-Shore-AI/ingot](https://github.com/North-Shore-AI/ingot)
+* Forge: [https://github.com/North-Shore-AI/forge](https://github.com/North-Shore-AI/forge)
+* Anvil: [https://github.com/North-Shore-AI/anvil](https://github.com/North-Shore-AI/anvil)
+* Phoenix: [https://www.phoenixframework.org/](https://www.phoenixframework.org/)
+* Phoenix LiveView: [https://hexdocs.pm/phoenix_live_view/](https://hexdocs.pm/phoenix_live_view/)
 
 For questions or support, please open an issue on GitHub.
