@@ -1,10 +1,6 @@
-<div align="center">
-
 # Ingot
 
-<img src="assets/ingot.svg" alt="Ingot Logo" width="392"/>
-
-</div>
+<p align="center"><img src="assets/ingot.svg" alt="Ingot Logo" width="392" /></p>
 
 [![Hex.pm](https://img.shields.io/hexpm/v/ingot.svg)](https://hex.pm/packages/ingot)
 [![Documentation](https://img.shields.io/badge/docs-hexpm-blue.svg)](https://hexdocs.pm/ingot)
