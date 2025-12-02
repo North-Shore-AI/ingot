@@ -14,10 +14,8 @@ defmodule Ingot.ForgeClient.ElixirAdapter do
 
   @behaviour Ingot.ForgeClient
 
-  alias Ingot.DTO.{Sample, Artifact}
-
   @impl true
-  def get_sample(sample_id) do
+  def get_sample(_sample_id) do
     # TODO: Integrate with Forge.Storage when available
     # case Forge.Storage.Postgres.fetch(sample_id, %{}) do
     #   {:ok, sample, _state} -> {:ok, to_sample_dto(sample)}
@@ -31,7 +29,7 @@ defmodule Ingot.ForgeClient.ElixirAdapter do
   end
 
   @impl true
-  def get_artifacts(sample_id) do
+  def get_artifacts(_sample_id) do
     # TODO: Integrate with Forge.Artifacts when available
     # case Forge.Artifacts.list_for_sample(sample_id) do
     #   {:ok, artifacts} -> {:ok, Enum.map(artifacts, &to_artifact_dto/1)}
@@ -53,7 +51,7 @@ defmodule Ingot.ForgeClient.ElixirAdapter do
   end
 
   @impl true
-  def fetch_next_sample(user_id) do
+  def fetch_next_sample(_user_id) do
     # TODO: Integrate with Forge when available
     {:error, :not_available}
   rescue

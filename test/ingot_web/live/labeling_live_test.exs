@@ -465,4 +465,288 @@ defmodule IngotWeb.LabelingLiveTest do
       _ -> 1
     end
   end
+
+  describe "keyboard shortcuts" do
+    test "1-5 keys rate the focused dimension", %{conn: conn} do
+      {:ok, view, html} = live(conn, "/label")
+
+      # Initially focused on coherence
+      assert html =~ "data-focused-dimension=\"coherence\""
+
+      # Press '3' key to rate coherence
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "3"})
+
+      # Should have rated coherence as 3
+      assert html =~ "data-coherence-rating=\"3\""
+
+      # Should advance focus to grounded
+      assert html =~ "data-focused-dimension=\"grounded\""
+    end
+
+    test "number keys only rate values 1-5", %{conn: conn} do
+      {:ok, view, _html} = live(conn, "/label")
+
+      # Press '0' should not rate
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "0"})
+
+      # Coherence should still be nil
+      refute html =~ "data-coherence-rating="
+
+      # Press '6' should not rate
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "6"})
+
+      # Coherence should still be nil
+      refute html =~ "data-coherence-rating="
+    end
+
+    test "Tab key advances focus between dimensions", %{conn: conn} do
+      {:ok, view, html} = live(conn, "/label")
+
+      # Initially focused on coherence
+      assert html =~ "data-focused-dimension=\"coherence\""
+
+      # Press Tab
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "Tab"})
+
+      # Should advance to grounded
+      assert html =~ "data-focused-dimension=\"grounded\""
+
+      # Press Tab again
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "Tab"})
+
+      # Should advance to novel
+      assert html =~ "data-focused-dimension=\"novel\""
+
+      # Press Tab again
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "Tab"})
+
+      # Should advance to balanced
+      assert html =~ "data-focused-dimension=\"balanced\""
+
+      # Press Tab on last dimension should stay on balanced
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "Tab"})
+
+      # Should stay on balanced
+      assert html =~ "data-focused-dimension=\"balanced\""
+    end
+
+    test "Enter key submits when all ratings complete", %{conn: conn} do
+      {:ok, view, html} = live(conn, "/label")
+
+      initial_sample_id = extract_sample_id(html)
+
+      # Rate all dimensions using number keys
+      view
+      |> element("div[phx-hook='KeyboardShortcuts']")
+      |> render_hook("keydown", %{"key" => "4"})
+
+      view
+      |> element("div[phx-hook='KeyboardShortcuts']")
+      |> render_hook("keydown", %{"key" => "5"})
+
+      view
+      |> element("div[phx-hook='KeyboardShortcuts']")
+      |> render_hook("keydown", %{"key" => "3"})
+
+      view
+      |> element("div[phx-hook='KeyboardShortcuts']")
+      |> render_hook("keydown", %{"key" => "4"})
+
+      # Press Enter to submit
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "Enter"})
+
+      # Should have submitted and loaded new sample
+      new_sample_id = extract_sample_id(html)
+      refute new_sample_id == initial_sample_id
+
+      # Should show 1 labeled
+      assert html =~ "1 labeled"
+    end
+
+    test "Enter key does nothing when ratings incomplete", %{conn: conn} do
+      {:ok, view, html} = live(conn, "/label")
+
+      initial_sample_id = extract_sample_id(html)
+
+      # Only rate coherence
+      view
+      |> element("div[phx-hook='KeyboardShortcuts']")
+      |> render_hook("keydown", %{"key" => "3"})
+
+      # Press Enter
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "Enter"})
+
+      # Should show error
+      assert html =~ "Please complete all ratings"
+
+      # Sample should not have changed
+      assert extract_sample_id(html) == initial_sample_id
+    end
+
+    test "S key skips current sample", %{conn: conn} do
+      {:ok, view, html} = live(conn, "/label")
+
+      initial_sample_id = extract_sample_id(html)
+
+      # Press 'S' to skip
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "s"})
+
+      # Should have new sample
+      new_sample_id = extract_sample_id(html)
+      refute new_sample_id == initial_sample_id
+
+      # Session counter should NOT increment
+      assert html =~ "0 labeled"
+    end
+
+    test "Q key quits session", %{conn: conn} do
+      {:ok, view, _html} = live(conn, "/label")
+
+      # Press 'Q' to quit
+      view
+      |> element("div[phx-hook='KeyboardShortcuts']")
+      |> render_hook("keydown", %{"key" => "q"})
+
+      # Should redirect to home
+      assert_redirect(view, "/")
+    end
+
+    test "Escape key quits session", %{conn: conn} do
+      {:ok, view, _html} = live(conn, "/label")
+
+      # Press Escape to quit
+      view
+      |> element("div[phx-hook='KeyboardShortcuts']")
+      |> render_hook("keydown", %{"key" => "Escape"})
+
+      # Should redirect to home
+      assert_redirect(view, "/")
+    end
+
+    test "? key toggles help modal", %{conn: conn} do
+      {:ok, view, html} = live(conn, "/label")
+
+      # Initially help modal is hidden
+      assert html =~ "data-show-help=\"false\""
+
+      # Press '?' to show help
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "?"})
+
+      # Help modal should be visible
+      assert html =~ "data-show-help=\"true\""
+
+      # Press '?' again to hide help
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "?"})
+
+      # Help modal should be hidden
+      assert html =~ "data-show-help=\"false\""
+    end
+
+    test "keyboard shortcuts are case insensitive for letter keys", %{conn: conn} do
+      {:ok, view, html} = live(conn, "/label")
+
+      initial_sample_id = extract_sample_id(html)
+
+      # Press uppercase 'S' to skip (with shift modifier)
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "S"})
+
+      # Should have skipped
+      new_sample_id = extract_sample_id(html)
+      refute new_sample_id == initial_sample_id
+    end
+
+    test "complete keyboard workflow: rate all dimensions with keys and submit", %{conn: conn} do
+      {:ok, view, html} = live(conn, "/label")
+
+      initial_sample_id = extract_sample_id(html)
+
+      # Rate coherence with '4'
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "4"})
+
+      assert html =~ "data-coherence-rating=\"4\""
+      assert html =~ "data-focused-dimension=\"grounded\""
+
+      # Rate grounded with '5'
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "5"})
+
+      assert html =~ "data-grounded-rating=\"5\""
+      assert html =~ "data-focused-dimension=\"novel\""
+
+      # Rate novel with '3'
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "3"})
+
+      assert html =~ "data-novel-rating=\"3\""
+      assert html =~ "data-focused-dimension=\"balanced\""
+
+      # Rate balanced with '4'
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "4"})
+
+      assert html =~ "data-balanced-rating=\"4\""
+
+      # Submit with Enter
+      html =
+        view
+        |> element("div[phx-hook='KeyboardShortcuts']")
+        |> render_hook("keydown", %{"key" => "Enter"})
+
+      # Should have submitted and loaded new sample
+      new_sample_id = extract_sample_id(html)
+      refute new_sample_id == initial_sample_id
+      assert html =~ "1 labeled"
+
+      # Focus should reset to coherence
+      assert html =~ "data-focused-dimension=\"coherence\""
+    end
+  end
 end

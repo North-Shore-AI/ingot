@@ -25,11 +25,38 @@ import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/ingot"
 import topbar from "../vendor/topbar"
 
+// Keyboard shortcuts hook
+let Hooks = {}
+
+Hooks.KeyboardShortcuts = {
+  mounted() {
+    this.handleKeydown = (e) => {
+      // Ignore if typing in input/textarea
+      if (e.target.matches('input, textarea')) return
+
+      // Push keyboard event to LiveView
+      this.pushEvent("keydown", {key: e.key})
+
+      // Prevent default for specific keys to avoid browser shortcuts
+      if (["Tab", "Enter", "Escape", "?"].includes(e.key) ||
+          (e.key >= "1" && e.key <= "5")) {
+        e.preventDefault()
+      }
+    }
+
+    window.addEventListener('keydown', this.handleKeydown)
+  },
+
+  destroyed() {
+    window.removeEventListener('keydown', this.handleKeydown)
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {...Hooks, ...colocatedHooks},
 })
 
 // Show progress bar on live navigation and form submits

@@ -23,6 +23,7 @@ defmodule IngotWeb.LabelingLive do
       |> assign(:active_labelers, 1)
       |> assign(:queue_stats, get_queue_stats())
       |> assign(:focused_dimension, :coherence)
+      |> assign(:show_help, false)
 
     if connected?(socket) do
       Progress.subscribe_all()
@@ -71,6 +72,10 @@ defmodule IngotWeb.LabelingLive do
   def handle_event("quit", _params, socket) do
     Progress.broadcast_user_left(socket.assigns.user_id)
     {:noreply, push_navigate(socket, to: "/")}
+  end
+
+  def handle_event("keydown", %{"key" => key}, socket) do
+    handle_keyboard_shortcut(key, socket)
   end
 
   @impl true
@@ -162,6 +167,61 @@ defmodule IngotWeb.LabelingLive do
     assign(socket, :focused_dimension, next_dimension)
   end
 
+  defp handle_keyboard_shortcut(key, socket) when key in ["1", "2", "3", "4", "5"] do
+    rating_value = String.to_integer(key)
+    dimension = socket.assigns.focused_dimension
+
+    socket =
+      socket
+      |> update(:ratings, &Map.put(&1, dimension, rating_value))
+      |> maybe_advance_focus(dimension)
+
+    {:noreply, socket}
+  end
+
+  defp handle_keyboard_shortcut("Tab", socket) do
+    next_dimension =
+      case socket.assigns.focused_dimension do
+        :coherence -> :grounded
+        :grounded -> :novel
+        :novel -> :balanced
+        :balanced -> :balanced
+      end
+
+    {:noreply, assign(socket, :focused_dimension, next_dimension)}
+  end
+
+  defp handle_keyboard_shortcut("Enter", socket) do
+    if all_ratings_complete?(socket.assigns.ratings) do
+      socket = submit_label(socket)
+      {:noreply, socket}
+    else
+      socket = put_flash(socket, :error, "Please complete all ratings before submitting")
+      {:noreply, socket}
+    end
+  end
+
+  defp handle_keyboard_shortcut(key, socket) when key in ["s", "S"] do
+    if socket.assigns.current_sample do
+      ForgeClient.skip_sample(socket.assigns.current_sample.id, socket.assigns.user_id)
+    end
+
+    {:noreply, fetch_next_sample(socket)}
+  end
+
+  defp handle_keyboard_shortcut(key, socket) when key in ["q", "Q", "Escape"] do
+    Progress.broadcast_user_left(socket.assigns.user_id)
+    {:noreply, push_navigate(socket, to: "/")}
+  end
+
+  defp handle_keyboard_shortcut("?", socket) do
+    {:noreply, update(socket, :show_help, &(!&1))}
+  end
+
+  defp handle_keyboard_shortcut(_key, socket) do
+    {:noreply, socket}
+  end
+
   defp generate_user_id do
     "user-#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
   end
@@ -182,6 +242,8 @@ defmodule IngotWeb.LabelingLive do
     ~H"""
     <div
       class="min-h-screen bg-gray-50 py-8"
+      phx-hook="KeyboardShortcuts"
+      id="labeling-container"
       data-user-id={@user_id}
       data-session-id={@session_id}
       data-sample-id={@current_sample && @current_sample.id}
@@ -193,6 +255,7 @@ defmodule IngotWeb.LabelingLive do
       data-grounded-rating={@ratings[:grounded]}
       data-novel-rating={@ratings[:novel]}
       data-balanced-rating={@ratings[:balanced]}
+      data-show-help={to_string(@show_help)}
     >
       <div class="max-w-4xl mx-auto px-4">
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -274,6 +337,100 @@ defmodule IngotWeb.LabelingLive do
           </p>
         </div>
       </div>
+      
+    <!-- Help Modal -->
+      <%= if @show_help do %>
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div class="bg-white rounded-lg shadow-xl p-8 max-w-2xl mx-4">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-2xl font-bold text-gray-800">Keyboard Shortcuts</h2>
+              <button
+                phx-click="keydown"
+                phx-value-key="?"
+                class="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div class="space-y-4">
+              <div class="border-b pb-4">
+                <h3 class="font-semibold text-gray-700 mb-3">Rating</h3>
+                <div class="space-y-2">
+                  <div class="flex items-center">
+                    <kbd class="px-3 py-1 bg-gray-200 rounded font-mono text-sm mr-4 min-w-[4rem] text-center">
+                      1-5
+                    </kbd>
+                    <span class="text-gray-600">
+                      Quick rating on the focused dimension
+                    </span>
+                  </div>
+                  <div class="flex items-center">
+                    <kbd class="px-3 py-1 bg-gray-200 rounded font-mono text-sm mr-4 min-w-[4rem] text-center">
+                      Tab
+                    </kbd>
+                    <span class="text-gray-600">Move to next rating dimension</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border-b pb-4">
+                <h3 class="font-semibold text-gray-700 mb-3">Actions</h3>
+                <div class="space-y-2">
+                  <div class="flex items-center">
+                    <kbd class="px-3 py-1 bg-gray-200 rounded font-mono text-sm mr-4 min-w-[4rem] text-center">
+                      Enter
+                    </kbd>
+                    <span class="text-gray-600">Submit label (when all ratings complete)</span>
+                  </div>
+                  <div class="flex items-center">
+                    <kbd class="px-3 py-1 bg-gray-200 rounded font-mono text-sm mr-4 min-w-[4rem] text-center">
+                      S
+                    </kbd>
+                    <span class="text-gray-600">Skip current sample</span>
+                  </div>
+                  <div class="flex items-center">
+                    <kbd class="px-3 py-1 bg-gray-200 rounded font-mono text-sm mr-4 min-w-[4rem] text-center">
+                      Q / Esc
+                    </kbd>
+                    <span class="text-gray-600">Quit labeling session</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pb-2">
+                <h3 class="font-semibold text-gray-700 mb-3">Help</h3>
+                <div class="flex items-center">
+                  <kbd class="px-3 py-1 bg-gray-200 rounded font-mono text-sm mr-4 min-w-[4rem] text-center">
+                    ?
+                  </kbd>
+                  <span class="text-gray-600">Toggle this help modal</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t text-sm text-gray-500">
+              <p>
+                Keyboard shortcuts only work when not typing in a text field. Press
+                <kbd class="px-2 py-1 bg-gray-200 rounded">?</kbd>
+                again to close this help.
+              </p>
+            </div>
+          </div>
+        </div>
+      <% end %>
     </div>
     """
   end

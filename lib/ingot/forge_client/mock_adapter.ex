@@ -8,7 +8,7 @@ defmodule Ingot.ForgeClient.MockAdapter do
 
   @behaviour Ingot.ForgeClient
 
-  alias Ingot.DTO.{Sample, Artifact}
+  alias Ingot.DTO.Sample
 
   @impl true
   def get_sample(sample_id) do

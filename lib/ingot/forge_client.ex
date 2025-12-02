@@ -12,7 +12,7 @@ defmodule Ingot.ForgeClient do
   alias Ingot.DTO.{Sample, Artifact}
 
   @type sample_id :: String.t()
-  @type error :: :not_found | :timeout | :network | {:unexpected, term()}
+  @type error :: :not_found | :timeout | :network | :not_available | {:unexpected, term()}
 
   @doc """
   Fetch a sample by ID.
@@ -42,7 +42,7 @@ defmodule Ingot.ForgeClient do
   Legacy API - maintained for backward compatibility.
   """
   @callback fetch_next_sample(user_id :: String.t()) ::
-              {:ok, map()} | {:error, :queue_empty}
+              {:ok, map()} | {:error, :queue_empty | error()}
 
   @doc """
   Mark sample as skipped by the user.

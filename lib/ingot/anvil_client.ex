@@ -9,7 +9,7 @@ defmodule Ingot.AnvilClient do
   - HTTPAdapter: REST API calls for separate deployments (future)
   """
 
-  alias Ingot.DTO.{Assignment, Label, QueueStats}
+  alias Ingot.DTO.{Assignment, QueueStats}
 
   @type queue_id :: String.t()
   @type assignment_id :: String.t()
@@ -18,6 +18,7 @@ defmodule Ingot.AnvilClient do
           :not_found
           | :no_assignments
           | :timeout
+          | :not_available
           | {:validation, map()}
           | {:unexpected, term()}
 
@@ -50,7 +51,8 @@ defmodule Ingot.AnvilClient do
 
   Legacy API - maintained for backward compatibility.
   """
-  @callback store_label(label :: map()) :: {:ok, map()} | {:error, :invalid_label}
+  @callback store_label(label :: map()) ::
+              {:ok, map()} | {:error, :invalid_label | error()}
 
   @doc """
   Get total count of all labels.
@@ -71,7 +73,7 @@ defmodule Ingot.AnvilClient do
 
   Legacy API - maintained for backward compatibility.
   """
-  @callback export_csv() :: {:ok, String.t()}
+  @callback export_csv() :: {:ok, String.t()} | {:error, error()}
 
   # Public API - delegates to configured adapter
 

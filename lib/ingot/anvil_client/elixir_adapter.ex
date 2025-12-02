@@ -14,10 +14,8 @@ defmodule Ingot.AnvilClient.ElixirAdapter do
 
   @behaviour Ingot.AnvilClient
 
-  alias Ingot.DTO.{Assignment, QueueStats}
-
   @impl true
-  def get_next_assignment(queue_id, user_id) do
+  def get_next_assignment(_queue_id, _user_id) do
     # TODO: Integrate with Anvil.Queue when available
     # case Anvil.Queue.get_next_assignment(queue_id, user_id) do
     #   {:ok, assignment} -> {:ok, to_assignment_dto(assignment)}
@@ -31,7 +29,7 @@ defmodule Ingot.AnvilClient.ElixirAdapter do
   end
 
   @impl true
-  def submit_label(assignment_id, values) do
+  def submit_label(_assignment_id, _values) do
     # TODO: Integrate with Anvil.Labels when available
     # case Anvil.Labels.submit(assignment_id, values) do
     #   :ok -> :ok
@@ -46,7 +44,7 @@ defmodule Ingot.AnvilClient.ElixirAdapter do
   end
 
   @impl true
-  def get_queue_stats(queue_id) do
+  def get_queue_stats(_queue_id) do
     # TODO: Integrate with Anvil.Stats when available
     # case Anvil.Stats.get_queue_stats(queue_id) do
     #   {:ok, stats} -> {:ok, to_queue_stats_dto(stats)}
@@ -59,7 +57,7 @@ defmodule Ingot.AnvilClient.ElixirAdapter do
   end
 
   @impl true
-  def store_label(label) do
+  def store_label(_label) do
     # TODO: Integrate with Anvil when available
     {:error, :not_available}
   rescue
