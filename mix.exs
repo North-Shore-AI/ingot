@@ -40,16 +40,16 @@ defmodule Ingot.MixProject do
 
   defp deps do
     [
-      {:phoenix, "~> 1.7.14"},
+      {:phoenix, "~> 1.7"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.20.17"},
+      {:phoenix_live_view, "~> 0.20 or ~> 1.0"},
       {:floki, ">= 0.30.0", only: :test},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:heroicons,
        github: "tailwindlabs/heroicons",
-       tag: "v2.1.1",
+       tag: "v2.2.0",
        sparse: "optimized",
        app: false,
        compile: false,
@@ -58,10 +58,10 @@ defmodule Ingot.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
-      {:dns_cluster, "~> 0.1.1"},
+      {:dns_cluster, "~> 0.1"},
       {:bandit, "~> 1.5"},
-      {:forge_ex, "~> 0.1.0"},
-      {:anvil_ex, "~> 0.1.0"},
+      {:forge_ex, "~> 0.1", optional: true},
+      {:anvil_ex, "~> 0.1", optional: true},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
       {:supertester, "~> 0.3.1", only: :test}
     ]
