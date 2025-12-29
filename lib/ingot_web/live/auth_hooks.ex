@@ -120,7 +120,9 @@ defmodule IngotWeb.Live.AuthHooks do
           queue_id_or_param
         end
 
-      case AnvilClient.check_queue_access(current_user.id, queue_id) do
+      case AnvilClient.check_queue_access(current_user.id, queue_id,
+             tenant_id: Application.get_env(:ingot, :default_tenant_id)
+           ) do
         {:ok, true} ->
           {:cont, assign(socket, :queue_id, queue_id)}
 

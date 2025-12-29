@@ -1,20 +1,47 @@
-defmodule IngotWeb.LabelingLive do
-  use IngotWeb, :live_view
+defmodule Ingot.Labeling.LabelingLive do
+  @moduledoc """
+  Host-agnostic LiveView for labeling interface.
 
-  alias Ingot.AnvilClient
+  This LiveView is designed to be portable and can be mounted in any Phoenix
+  application using the `Ingot.Labeling.Router.labeling_routes/2` macro.
+
+  Configuration is injected via session (from the router macro), and all data
+  operations are delegated to a backend module implementing `Ingot.Labeling.Backend`.
+  """
+
+  use Phoenix.LiveView
+
   alias Ingot.Components.DefaultComponent
   alias LabelingIR.{Assignment, Label, Schema}
 
   @impl true
   def mount(%{"queue_id" => queue_id}, session, socket) do
-    tenant_id = session["tenant_id"] || "dev"
-    user_id = session["user_id"] || generate_user_id()
+    # Extract configuration from session (injected by router macro)
+    config = session["labeling_config"] || %{}
+    backend = Map.get(config, :backend)
+
+    unless backend do
+      raise ArgumentError, """
+      Labeling backend not configured. Ensure you pass a :backend in the config option:
+
+        labeling_routes "/labeling",
+          config: %{backend: MyApp.LabelingBackend}
+      """
+    end
+
+    # Get tenant_id from config or session
+    tenant_id = Map.get(config, :tenant_id) || session["tenant_id"] || "dev"
+
+    # Get user_id from session (set by on_mount hooks)
+    user_id = session["user_id"] || session["current_user_id"] || generate_user_id()
 
     socket =
       socket
+      |> assign(:backend, backend)
       |> assign(:queue_id, queue_id)
       |> assign(:tenant_id, tenant_id)
       |> assign(:user_id, user_id)
+      |> assign(:config, config)
       |> assign(:assignment, nil)
       |> assign(:component, DefaultComponent)
       |> assign(:component_assets, %{css: [], js: [], hooks: []})
@@ -36,7 +63,10 @@ defmodule IngotWeb.LabelingLive do
 
     case build_label(socket.assigns.assignment, socket.assigns, label_data) do
       {:ok, label} ->
-        case AnvilClient.submit_label(socket.assigns.assignment.id, label,
+        # Use backend to submit label
+        case socket.assigns.backend.submit_label(
+               socket.assigns.assignment.id,
+               label,
                tenant_id: socket.assigns.tenant_id
              ) do
           {:ok, _stored} ->
@@ -77,7 +107,10 @@ defmodule IngotWeb.LabelingLive do
   end
 
   defp fetch_assignment(socket) do
-    case AnvilClient.get_next_assignment(socket.assigns.queue_id, socket.assigns.user_id,
+    # Use backend to get next assignment
+    case socket.assigns.backend.get_next_assignment(
+           socket.assigns.queue_id,
+           socket.assigns.user_id,
            tenant_id: socket.assigns.tenant_id
          ) do
       {:ok, %Assignment{} = assignment} ->

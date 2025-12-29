@@ -2,6 +2,7 @@
 
 ## Scope
 - `SampleIR`, `DatasetIR`, `SchemaIR`, `AssignmentIR`, `LabelIR`, `EvalRunIR`, `Artifact` (and future `MemoryIR`, `PolicyIR`).
+- Canonical definitions live in the shared `labeling_ir` library (GitHub: `North-Shore-AI/labeling_ir`); services must not fork them.
 
 ## Versioning
 - Use `/v1` REST namespace and module names without suffix for current IR.

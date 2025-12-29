@@ -4,6 +4,7 @@
 A shared mental model for human-in-the-loop labeling and evaluation across the North Shore stack. CNS is a *consumer* of this system, never a dependency.
 
 ## Roles
+- **Shared IR library**: `labeling_ir` (GitHub: `North-Shore-AI/labeling_ir`) hosts the IR structs (`SampleIR`, `DatasetIR`, `SchemaIR`, `AssignmentIR`, `LabelIR`, `EvalRunIR`, `Artifact`) used by all services and clients.
 - **Forge**: Generates samples and datasets. Emits `SampleIR` and `DatasetIR` slices. No UI logic.
 - **Anvil**: Manages queues, assignments, schemas, labels, and eval runs. Exposes a stable API. Enforces tenancy and component selection.
 - **Ingot**: UI shell. Resolves component modules per queue and renders forms/samples. Ships with a generic default component; custom components live in external packages.

@@ -1,6 +1,6 @@
 # Labeling API Guide (Forge / Anvil)
 
-Audience: non-Elixir clients (Python/JS) and Ingot UI. Transport: REST/JSON (recommended) with tenant scoping.
+Audience: non-Elixir clients (Python/JS) and Ingot UI. Transport: REST/JSON (recommended) with tenant scoping. Structs are defined in the shared `labeling_ir` library.
 
 ## Auth & tenancy
 - Header `X-Tenant-ID: <tenant>` required on all writes.

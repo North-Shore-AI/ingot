@@ -1,7 +1,8 @@
 # Labeling IR Specification
 
 Version: 2025-12-02 (initial)  
-Scope: Forge, Anvil, Ingot, external clients
+Scope: Forge, Anvil, Ingot, external clients  
+Source: Shared library `labeling_ir` (GitHub: `North-Shore-AI/labeling_ir`)
 
 ## Common fields
 - `tenant_id :: String` (required)

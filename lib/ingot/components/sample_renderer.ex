@@ -56,7 +56,7 @@ defmodule Ingot.SampleRenderer do
       end
   """
 
-  alias Ingot.DTO.Sample
+  alias LabelingIR.Sample
 
   @doc """
   Render sample content as Phoenix.LiveView.Rendered or HTML-safe iodata.

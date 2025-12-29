@@ -8,6 +8,17 @@
       {assigns[:page_title]}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+    <% assets = assigns[:component_assets] || %{css: [], js: [], hooks: []} %>
+    <%= for css <- Map.get(assets, :css, []) do %>
+      <link rel="stylesheet" href={css} />
+    <% end %>
+    <script>
+      window.__component_hooks = <%= Phoenix.HTML.raw(Jason.encode!(Map.get(assets, :hooks, []))) %>;
+    </script>
+    <%= for js <- Map.get(assets, :js, []) do %>
+      <script defer src={js}>
+      </script>
+    <% end %>
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
     <script>

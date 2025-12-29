@@ -28,6 +28,26 @@ import topbar from "../vendor/topbar"
 // Keyboard shortcuts hook
 let Hooks = {}
 
+const normalizeHookName = (hook) => {
+  if (typeof hook === "string") return hook
+  if (typeof hook === "function" && hook.name) return hook.name
+  if (hook && typeof hook.name === "string") return hook.name
+  if (hook && typeof hook.toString === "function") return hook.toString()
+  return null
+}
+
+const registerComponentHooks = () => {
+  const dynamicHooks = window.__component_hooks || []
+  dynamicHooks
+    .map(normalizeHookName)
+    .filter(Boolean)
+    .forEach((hookName) => {
+      if (window[hookName]) {
+        Hooks[hookName] = window[hookName]
+      }
+    })
+}
+
 Hooks.KeyboardShortcuts = {
   mounted() {
     this.handleKeydown = (e) => {
@@ -51,6 +71,8 @@ Hooks.KeyboardShortcuts = {
     window.removeEventListener('keydown', this.handleKeydown)
   }
 }
+
+registerComponentHooks()
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
@@ -107,4 +129,3 @@ if (process.env.NODE_ENV === "development") {
     window.liveReloader = reloader
   })
 }
-

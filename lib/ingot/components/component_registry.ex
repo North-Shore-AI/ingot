@@ -151,7 +151,9 @@ defmodule Ingot.Components.ComponentRegistry do
   ## Private Functions
 
   defp fetch_and_load_component(queue_id) do
-    case AnvilClient.get_next_assignment(queue_id, "component-registry") do
+    case AnvilClient.get_next_assignment(queue_id, "component-registry",
+           tenant_id: default_tenant_id()
+         ) do
       {:ok, assignment} ->
         component_module = get_in(assignment.metadata, ["component_module"])
 
@@ -183,6 +185,8 @@ defmodule Ingot.Components.ComponentRegistry do
         {:error, reason}
     end
   end
+
+  defp do_load_component(nil), do: {:ok, DefaultComponent}
 
   defp do_load_component(module_name) when is_binary(module_name) do
     # Convert string to atom (only if atom already exists)
@@ -217,5 +221,9 @@ defmodule Ingot.Components.ComponentRegistry do
 
     Ingot.SampleRenderer in all_behaviors and
       Ingot.LabelFormRenderer in all_behaviors
+  end
+
+  defp default_tenant_id do
+    Application.get_env(:ingot, :default_tenant_id)
   end
 end

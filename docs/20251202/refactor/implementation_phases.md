@@ -9,7 +9,7 @@
 - Update tests to use DOM IDs and AssignmentIR fixtures.
 
 ## Phase 2: Anvil/Forge IR alignment
-- Define and expose `SchemaIR`, `AssignmentIR`, `LabelIR`, `EvalRunIR`, `SampleIR`, `DatasetIR` modules + REST `/v1`.
+- Define and expose `SchemaIR`, `AssignmentIR`, `LabelIR`, `EvalRunIR`, `SampleIR`, `DatasetIR` modules + REST `/v1` using the shared `labeling_ir` library.
 - Enforce `component_module` in queue metadata; add tenancy checks on all endpoints.
 - Provide dataset/slice fetch in Forge; queue uses sample refs; Anvil may embed samples in assignments.
 - Export labels/evals as `BatchIR` jsonl/msgpack.

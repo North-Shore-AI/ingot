@@ -1,7 +1,7 @@
 defmodule Ingot.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.2.0"
   @source_url "https://github.com/North-Shore-AI/ingot"
 
   def project do
@@ -56,26 +56,27 @@ defmodule Ingot.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1"},
       {:bandit, "~> 1.5"},
+      {:labeling_ir, "~> 0.1.0"},
       {:ecto_sql, "~> 3.10", optional: true, runtime: false},
       {:postgrex, "~> 0.17", optional: true, runtime: false},
       {:oban, "~> 2.17", optional: true, runtime: false},
       {:cachex, "~> 3.6", optional: true, runtime: false},
       {:fuse, "~> 2.5", optional: true, runtime: false},
-      {:httpoison, "~> 2.2", optional: true, runtime: false},
-      {:forge, "~> 0.1.0", hex: :forge_ex, optional: true, runtime: false},
-      {:anvil, "~> 0.1.0", hex: :anvil_ex, optional: true, runtime: false},
+      {:httpoison, "~> 2.2", optional: true},
+      {:forge, "~> 0.1.1", hex: :forge_ex, optional: true, runtime: false},
+      {:anvil, "~> 0.1.1", hex: :anvil_ex, optional: true, runtime: false},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:supertester, "~> 0.3.1", only: :test}
+      {:supertester, "~> 0.4.0", only: :test}
     ]
   end
 
   defp description do
     """
-    Phoenix LiveView interface for sample generation and human labeling
-    workflows. Thin wrapper around Forge (sample factory) and Anvil
-    (labeling queue) with real-time progress updates, keyboard shortcuts,
-    and inter-rater reliability dashboards.
+    Composable Phoenix LiveView labeling feature module. Provides portable
+    labeling UI that can be embedded in any Phoenix app with a single router
+    macro. Includes pluggable backends, customizable components, and works
+    with Forge (sample factory) and Anvil (labeling queue).
     """
   end
 
@@ -114,11 +115,6 @@ defmodule Ingot.MixProject do
         "Live Views": [
           IngotWeb.LabelingLive,
           IngotWeb.DashboardLive
-        ],
-        Components: [
-          IngotWeb.SampleComponent,
-          IngotWeb.LabelFormComponent,
-          IngotWeb.ProgressComponent
         ]
       ]
     ]

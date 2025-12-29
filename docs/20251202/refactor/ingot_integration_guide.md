@@ -3,6 +3,9 @@
 ## Goal
 Render any queue by metadata only: Ingot asks Anvil for an Assignment, loads the component module from queue metadata, and renders schema-driven UI. CNS and other domains live in their own component packages.
 
+## IR source
+Consume structs from the shared `labeling_ir` library (`North-Shore-AI/labeling_ir`), not ad hoc local definitions.
+
 ## Runtime Flow
 1) Route: `/queues/:queue_id/label` (LiveView). Session carries `tenant_id`, `user_id`.
 2) Ingot calls `Anvil.get_next_assignment(queue_id, user_id)` → `AssignmentIR`.
@@ -74,6 +77,17 @@ end
 ## Assets Injection
 - In layout (before `</head>`), include css/js from `@component.required_assets/0`.
 - Register hooks in `app.js` when listed.
+
+## HTTP adapters and tenancy
+- Default adapters point to the `/v1` HTTP APIs (`Ingot.AnvilClient.HTTPAdapter` / `Ingot.ForgeClient.HTTPAdapter`).
+- Configure `:anvil_base_url`, `:forge_base_url`, and `:default_tenant_id` (env `INGOT_TENANT_ID`) for headers.
+- LiveViews pass `tenant_id` from the session into client calls; adapters fall back to the configured default for background tasks.
+- Keep `config/test.exs` on mock adapters so tests remain isolated.
+
+## Component hooks
+- Components can expose JS hooks via `required_assets/0` returning `%{hooks: ["MyHook"]}` or atoms.
+- Layout injects them into `window.__component_hooks`; `app.js` registers any matching globals (string or atom names) as LiveView hooks.
+- Example external package hook: `Acme.NewsHooks` in `acme_components` JS bundle set on `window.AcmeNewsHook`.
 
 ## Validation
 - Optional `validate_label/2` on component; Ingot should call it before submit when exported.

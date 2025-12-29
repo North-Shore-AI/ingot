@@ -1,5 +1,6 @@
 defmodule IngotWeb.Router do
   use IngotWeb, :router
+  import Ingot.Labeling.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -33,8 +34,19 @@ defmodule IngotWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    live "/label", LabelingLive, :index
-    live "/dashboard", DashboardLive, :index
+  end
+
+  # Labeling routes using composable macro
+  scope "/" do
+    pipe_through :browser
+
+    labeling_routes("/dashboard",
+      root_layout: {IngotWeb.Layouts, :root},
+      config: %{
+        backend: Ingot.Labeling.AnvilClientBackend,
+        default_queue_id: "queue-news"
+      }
+    )
   end
 
   # Health check endpoint (no auth required)

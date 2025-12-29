@@ -8,27 +8,103 @@
 [![License](https://img.shields.io/github/license/North-Shore-AI/ingot.svg)](LICENSE)
 [![GitHub](https://img.shields.io/badge/github-North--Shore--AI%2Fingot-blue?logo=github)](https://github.com/North-Shore-AI/ingot)
 
-Ingot is a Phoenix LiveView application for **sample generation** and **human labeling workflows**, built on top of [Forge](https://hex.pm/packages/forge_ex) and [Anvil](https://hex.pm/packages/anvil_ex).
+Ingot is a **composable Phoenix LiveView labeling feature module** that can be embedded in any Phoenix application. Built on top of [Forge](https://hex.pm/packages/forge_ex) and [Anvil](https://hex.pm/packages/anvil_ex), it provides a portable labeling interface with pluggable backends.
 
-In a world already full of perfectly good data labeling tools, Ingot is the one that runs on the BEAM for reasons that, in hindsight, appear to be *intentional*.
+In a world already full of perfectly good data labeling tools, Ingot is the one that runs on the BEAM *and* can be mounted in your existing Phoenix app with a single router macro.
 
 ---
 
 ## What is Ingot?
 
-Ingot is a **thin web shell** around two Elixir libraries:
+Ingot is a **composable feature library** providing labeling UI for Elixir/Phoenix applications. It consists of:
 
-- **[Forge](https://hex.pm/packages/forge_ex)** – creates and manages *samples* via pipelines
-- **[Anvil](https://hex.pm/packages/anvil_ex)** – manages human labeling queues, assignments, labels, and agreements
+- **[Forge](https://hex.pm/packages/forge_ex)** integration – creates and manages *samples* via pipelines
+- **[Anvil](https://hex.pm/packages/anvil_ex)** integration – manages human labeling queues, assignments, labels, and agreements
+- **Host-agnostic LiveViews** – portable labeling interface using `Phoenix.LiveView` directly
+- **Backend behaviour** – pluggable data layer (use Anvil, Ecto, HTTP API, or in-memory)
+- **Router macro** – mount labeling routes with `labeling_routes/2`
 
-Ingot’s job is to:
+Ingot's job is to:
 
-- Render labeling UIs (via LiveView) from Anvil label schemas
-- Surface pipelines, queues, and agreement metrics in a browser
-- Handle sessions, auth, and user flows for labelers and admins
-- Stay out of the way of your actual business logic
+- Provide portable labeling UIs that work in any Phoenix app
+- Render labeling interfaces from label schemas
+- Enable custom sample/form rendering via component behaviours
+- Stay out of the way of your business logic
 
-Think of it as the **UI layer** that turns Forge + Anvil into a usable product, without smuggling any domain logic into Phoenix.
+Think of it as a **feature module** you can drop into any Phoenix app, similar to `phoenix_live_dashboard` or `oban_web`.
+
+---
+
+## Quick Start
+
+### Installation
+
+Add to your `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:ingot, "~> 0.2.0"}
+  ]
+end
+```
+
+### 1. Implement Backend
+
+```elixir
+defmodule MyApp.LabelingBackend do
+  @behaviour Ingot.Labeling.Backend
+
+  @impl true
+  def get_next_assignment(queue_id, user_id, opts) do
+    # Your implementation
+  end
+
+  @impl true
+  def submit_label(assignment_id, label, opts) do
+    # Your implementation
+  end
+
+  @impl true
+  def get_queue_stats(queue_id, opts) do
+    # Your implementation
+  end
+end
+```
+
+Or use the Anvil adapter:
+
+```elixir
+# Use Ingot.Labeling.AnvilClientBackend if you have Anvil configured
+```
+
+### 2. Mount Routes
+
+```elixir
+defmodule MyAppWeb.Router do
+  use MyAppWeb, :router
+  import Ingot.Labeling.Router
+
+  scope "/" do
+    pipe_through [:browser, :require_authenticated]
+
+    labeling_routes "/labeling",
+      on_mount: [MyAppWeb.AuthLive],
+      root_layout: {MyAppWeb.Layouts, :app},
+      config: %{
+        backend: MyApp.LabelingBackend,
+        default_queue_id: "my-queue"
+      }
+  end
+end
+```
+
+### 3. Start Labeling
+
+- Visit `/labeling` for the dashboard
+- Visit `/labeling/queues/:queue_id/label` to start labeling
+
+See `example/` for a complete working example.
 
 ---
 
@@ -124,6 +200,25 @@ config :ingot,
 ```
 
 You’ll also need to configure Forge and Anvil (pipelines, queues, label schemas) in your umbrella or host application.
+
+### Connecting to Forge and Anvil
+
+Ingot talks to Forge/Anvil through configurable client adapters:
+
+- **HTTP (default)** – In `config/config.exs` and `prod.exs`, adapters are set to `Ingot.ForgeClient.HTTPAdapter` / `Ingot.AnvilClient.HTTPAdapter`. You must run Forge and Anvil with their Plug/Cowboy servers enabled (Forge defaults to port `4102`, Anvil to `4101`) and set `forge_base_url` / `anvil_base_url` and timeouts.
+- **Elixir (in-VM)** – To call the libraries directly inside the same BEAM, include the deps as runtime (remove `optional: true, runtime: false` for `forge_ex` / `anvil_ex` in your app’s `mix.exs`) and set:
+
+  ```elixir
+  # config/runtime.exs
+  config :ingot,
+    forge_client_adapter: Ingot.ForgeClient.ElixirAdapter,
+    anvil_client_adapter: Ingot.AnvilClient.ElixirAdapter
+  ```
+
+  In this mode you don’t need the HTTP URLs, but you do need to start the Forge/Anvil apps in the same VM.
+- **Mock** – In tests, `config/test.exs` points to mock adapters; no services required.
+
+Pick one path per environment and ensure the corresponding services (HTTP) or deps/apps (Elixir) are available.
 
 ---
 

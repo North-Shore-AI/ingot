@@ -27,7 +27,7 @@ defmodule Ingot.Components.DefaultComponent do
   @behaviour Ingot.SampleRenderer
   @behaviour Ingot.LabelFormRenderer
 
-  alias Ingot.DTO.Sample
+  alias LabelingIR.Sample
 
   ## SampleRenderer Implementation
 
@@ -66,14 +66,20 @@ defmodule Ingot.Components.DefaultComponent do
     assigns = %{schema: schema, label_data: label_data}
 
     ~H"""
-    <div class="default-label-form">
+    <form
+      id="label-form"
+      class="default-label-form"
+      phx-change="update_label"
+      phx-submit="submit_label"
+    >
       <%= for field <- @schema.fields do %>
         <div class="dimension">
           <label>{field.name}</label>
           {render_field(field, @label_data)}
         </div>
       <% end %>
-    </div>
+      <button id="submit-button" type="submit">Submit</button>
+    </form>
     """
   end
 
@@ -103,11 +109,11 @@ defmodule Ingot.Components.DefaultComponent do
   end
 
   defp render_field(field, label_data) do
-    case field.type do
-      "scale" ->
+    case normalize_type(field.type) do
+      :scale ->
         assigns = %{
           field: field,
-          value: get_field_value(label_data, field.name, field[:default])
+          value: get_field_value(label_data, field.name, field.default)
         }
 
         ~H"""
@@ -120,7 +126,7 @@ defmodule Ingot.Components.DefaultComponent do
         />
         """
 
-      "text" ->
+      :text ->
         assigns = %{
           field: field,
           value: get_field_value(label_data, field.name, "")
@@ -130,7 +136,7 @@ defmodule Ingot.Components.DefaultComponent do
         <textarea name={"label_data[#{@field.name}]"}><%= @value %></textarea>
         """
 
-      "boolean" ->
+      :boolean ->
         assigns = %{
           field: field,
           checked: get_field_value(label_data, field.name, false)
@@ -176,4 +182,14 @@ defmodule Ingot.Components.DefaultComponent do
   defp format_payload(payload) do
     inspect(payload, pretty: true)
   end
+
+  defp normalize_type(type) when is_binary(type) do
+    try do
+      String.to_existing_atom(type)
+    rescue
+      ArgumentError -> String.to_atom(type)
+    end
+  end
+
+  defp normalize_type(type), do: type
 end

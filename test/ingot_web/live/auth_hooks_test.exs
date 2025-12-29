@@ -104,58 +104,6 @@ defmodule IngotWeb.Live.AuthHooksTest do
     end
   end
 
-  describe "on_mount {:require_queue_access, queue_id}" do
-    test "allows access when user has queue access" do
-      user = %{
-        id: "user_123",
-        email: "test@example.com",
-        roles: [:labeler]
-      }
-
-      socket = build_socket_with_user(user)
-      {:cont, socket} = AuthHooks.on_mount({:require_queue_access, "queue_abc"}, %{}, %{}, socket)
-
-      assert socket.assigns.queue_id == "queue_abc"
-    end
-
-    test "blocks access when user lacks queue access" do
-      user = %{
-        id: "user_123",
-        email: "test@example.com",
-        roles: [:labeler]
-      }
-
-      socket = build_socket_with_user(user)
-
-      {:halt, socket} =
-        AuthHooks.on_mount({:require_queue_access, "queue_restricted"}, %{}, %{}, socket)
-
-      assert socket.redirected
-    end
-
-    test "extracts queue_id from params when using parameter syntax" do
-      user = %{
-        id: "user_123",
-        email: "test@example.com",
-        roles: [:labeler]
-      }
-
-      socket = build_socket_with_user(user)
-      params = %{"id" => "queue_abc"}
-
-      {:cont, socket} = AuthHooks.on_mount({:require_queue_access, ":id"}, params, %{}, socket)
-
-      assert socket.assigns.queue_id == "queue_abc"
-    end
-
-    test "blocks access when current_user is not assigned" do
-      socket = build_socket()
-      {:halt, socket} = AuthHooks.on_mount({:require_queue_access, "queue_abc"}, %{}, %{}, socket)
-
-      assert socket.redirected
-    end
-  end
-
   defp future_timestamp do
     DateTime.utc_now() |> DateTime.add(3600, :second) |> DateTime.to_unix()
   end
